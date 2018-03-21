@@ -1,0 +1,48 @@
+{
+  "extends": "./cli-tslint.json",
+  "rules": {
+    "adjacent-overload-signatures": true,
+    "class-name": true,
+    "comment-format": [true, "check-space"],
+    "curly": false,
+    "eofline": true,
+    "indent": [true, "spaces"],
+    "label-position": true,
+    "member-ordering": [true,
+      "public-before-private",
+      "static-before-instance",
+      "variables-before-functions"
+    ],
+    "no-arg": true,
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-variable": true,
+    "no-eval": true,
+    "no-input-rename": false,
+    "no-output-rename": false,
+    "no-reference": true,
+    "no-shadowed-variable": false,
+    "no-unused-expression": true,
+    "no-use-before-declare": true,
+    "no-var-keyword": true,
+    "no-var-requires": false,
+    "no-trailing-whitespace": false,
+    "one-line": false,
+    "radix": true,
+    "semicolon": [true, "always"],
+    "triple-equals": [true, "allow-null-check"],
+    "typedef-whitespace": [true, {
+      "call-signature": "nospace",
+      "index-signature": "nospace",
+      "parameter": "nospace",
+      "property-declaration": "nospace",
+      "variable-declaration": "nospace"
+    }],
+    "whitespace": [true,
+      "check-branch",
+      "check-decl",
+      "check-separator",
+      "check-type"
+    ]
+  }
+}

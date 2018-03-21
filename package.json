@@ -5,7 +5,6 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "xxx": "eslint --init",
     "serve": "ng serve",
     "build": "ng build --prod",
     "electron": "electron ."
@@ -17,7 +16,6 @@
     "@angular/compiler": "^5.2.0",
     "@angular/core": "^5.2.0",
     "@angular/forms": "^5.2.0",
-    "@angular/http": "^5.2.0",
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
@@ -32,10 +30,8 @@
     "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
     "@types/node": "~6.0.60",
-    "codelyzer": "^4.0.1",
     "electron": "^1.8.4",
     "eslint": "^4.19.0",
-    "eslint-config-google": "^0.9.1",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"

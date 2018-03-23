@@ -30,6 +30,7 @@
     "@angular/compiler-cli": "^5.2.0",
     "@angular/language-service": "^5.2.0",
     "@types/node": "~6.0.60",
+    "codelyzer": "^4.0.1",
     "electron": "^1.8.4",
     "eslint": "^4.19.0",
     "ts-node": "~4.1.0",

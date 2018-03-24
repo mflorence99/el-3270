@@ -1,12 +1,9 @@
-const {
-  app,
-  BrowserWindow
-} = require('electron');
+import { BrowserWindow, app } from 'electron';
 
 let theWindow;
 
 app.on('ready', function () {
-  theWindow = new BrowserWindow({frame: 'false'});
+  theWindow = new BrowserWindow({});
   theWindow.loadURL('http://localhost:4200');
   theWindow.setMenu(null);
   theWindow.on('closed', function () {

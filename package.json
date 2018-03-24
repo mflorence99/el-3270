@@ -1,13 +1,14 @@
 {
   "name": "el3270",
-  "main": "main.js",
+  "main": "dist/main.js",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
     "serve": "ng serve",
     "build": "ng build --prod",
-    "electron": "electron ."
+    "electron": "tsc -p tsconfig.main.json && electron .",
+    "tsc": "tsc"
   },
   "private": true,
   "dependencies": {

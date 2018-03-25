@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+lib-drawer-panel {
+  background-color: white;
+  padding: 16px;
+
+  &[position=left],
+  &[position=right] {
+    width: 300px;
+  }
+
+  &[position=top],
+  &[position=bottom] {
+    height: 240px;
+    width: 480px;
+  }
+
+}

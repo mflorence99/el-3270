@@ -1,7 +1,13 @@
-<button (click)="connect()">
-  Connect
-</button>
+<lib-drawer-container>
 
-<button (click)="disconnect()">
-  Disonnect
-</button>
+  <header (click)="rightDrawer.open()">
+    HEADER
+  </header>
+
+  <lib-drawer-panel
+    #rightDrawer
+    position="right">
+    Right side panel
+  </lib-drawer-panel>
+
+</lib-drawer-container>

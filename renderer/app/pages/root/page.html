@@ -1,0 +1,46 @@
+<lib-drawer-container>
+
+  <header (click)="rightDrawer.open()">
+    HEADER
+  </header>
+
+  <form
+    (submit)="xxx()"
+    [formGroup]="theForm"
+    novalidate>
+
+    <mat-checkbox
+      formControlName="checkbox">
+      Check me!
+    </mat-checkbox>
+
+    <mat-form-field>
+      <input
+        formControlName="input"
+        matInput
+        formControlName="input"
+        placeholder="Favorite food">
+    </mat-form-field>
+
+    <button
+      color="primary"
+      mat-raised-button
+      type="submit">
+      Submit
+    </button>
+
+  </form>
+
+  <div class="tn3270">
+    {{ theForm.valueChanges | async | json }}
+  </div>
+
+  <lib-drawer-panel
+    #rightDrawer
+    position="right">
+    <button mat-icon-button color="accent">
+      <i class="fas fa-cog fa-lg"></i>
+    </button>
+  </lib-drawer-panel>
+
+</lib-drawer-container>

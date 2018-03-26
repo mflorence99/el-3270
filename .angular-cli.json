@@ -20,8 +20,10 @@
         "../node_modules/roboto-fontface/css/roboto/roboto-fontface.css",
         "../node_modules/@fortawesome/fontawesome-free-webfonts/css/fa-solid.css",
         "../node_modules/@fortawesome/fontawesome-free-webfonts/css/fontawesome.css",
+        "../node_modules/tn3270/fonts/3270.css",
+        "../node_modules/ellib/lib/assets/colors.css",
         "../node_modules/ellib/lib/assets/theme.css",
-        "theme.css"
+        "theme.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
@@ -32,7 +34,7 @@
     }
   ],
   "defaults": {
-    "styleExt": "less",
+    "styleExt": "scss",
     "component": {}
   }
 }

@@ -1,11 +1,7 @@
-import { EL3270Module } from './app/module';
-import { enableProdMode } from '@angular/core';
-import { environment } from './environments/environment';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import 'hammerjs';
 
-if (environment.production) {
-  enableProdMode();
-}
+import { EL3270Module } from './app/module';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 platformBrowserDynamic().bootstrapModule(EL3270Module)
   .catch(err => console.log(err));

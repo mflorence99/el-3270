@@ -1,46 +1,46 @@
 <lib-drawer-container>
 
-  <header (click)="rightDrawer.open()">
-    HEADER
-  </header>
-
-  <form
-    (submit)="xxx()"
-    [formGroup]="theForm"
-    novalidate>
-
-    <mat-checkbox
-      formControlName="checkbox">
-      Check me!
-    </mat-checkbox>
-
-    <mat-form-field>
-      <input
-        formControlName="input"
-        matInput
-        formControlName="input"
-        placeholder="Favorite food">
-    </mat-form-field>
+  <nav>
 
     <button
-      color="primary"
-      mat-raised-button
-      type="submit">
-      Submit
+      (click)="connect()"
+      mat-icon-button>
+      <i class="fas fa-desktop fa-lg"></i>
     </button>
 
-  </form>
+    <button
+      (click)="disconnect()"
+      mat-icon-button>
+      <i class="fas fa-power-off fa-lg"></i>
+    </button>
 
-  <div class="tn3270">
-    {{ theForm.valueChanges | async | json }}
-  </div>
+    <button
+      (click)="help()"
+      mat-icon-button>
+      <i class="fas fa-question-circle fa-lg"></i>
+    </button>
 
-  <lib-drawer-panel
-    #rightDrawer
-    position="right">
-    <button mat-icon-button color="accent">
+    <div>&nbsp;</div>
+
+    <button
+      (click)="prefs.open()"
+      mat-icon-button>
       <i class="fas fa-cog fa-lg"></i>
     </button>
+
+  </nav>
+
+  <lib-animated-router-outlet
+    class="content">
+  </lib-animated-router-outlet>
+
+
+  <lib-drawer-panel
+    #prefs
+    position="right">
+
+    <el3270-prefs></el3270-prefs>
+
   </lib-drawer-panel>
 
 </lib-drawer-container>

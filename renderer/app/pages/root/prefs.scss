@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  overflow: auto;
+  padding: 16px;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+form {
+  display: grid;
+  grid-gap: 16px;
+  grid-template-columns: 1fr;
+
+  .hostAndPort {
+    display: grid;
+    grid-template-columns: 192px 64px;
+    justify-content: space-between;
+
+    mat-error {
+      grid-column-start: span 2;
+    }
+
+  }
+
+  .model {
+    display: grid;
+    grid-gap: 8px;
+    grid-template-columns: auto;
+
+    i {
+      font-size: 0.8em;
+    }
+    
+  }
+
+  .okAndCancel {
+    display: grid;
+    grid-gap: 16px;
+    grid-template-columns: auto auto;
+    justify-content: right;
+  }
+
+}

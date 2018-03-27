@@ -1,12 +1,8 @@
-import { FormBuilder, FormGroup } from '@angular/forms';
-
-import { Cell } from 'tn3270/lib';
 import { Component } from '@angular/core';
-import { ElectronService } from 'ngx-electron';
-import { EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 
 /**
- * All this is experimental
+ * EL-3270 Root
  */
 
 @Component({
@@ -17,31 +13,22 @@ import { EventEmitter } from '@angular/core';
 
 export class RootPageComponent {
 
-  theForm: FormGroup;
+  /** ctor */
+  constructor(private router: Router) { }
 
-  constructor(private electron: ElectronService,
-              private fb: FormBuilder) {
-    this.electron.ipcRenderer.on('outbound',
-      (event: any, buffer: Cell[], cursor: number) => {
-      console.log(buffer);
-    });
-    this.theForm = this.fb.group({
-      checkbox: false,
-      input: ''
-    });
-  }
-
+  /** Connect to host */
   connect() {
-    this.electron.ipcRenderer.send('connect', 'localhost', 3270, 'IBM-3278-4-E', 80, 43);
+    this.router.navigate(['screen']);
   }
 
+  /** Disconnect from host */
   disconnect() {
-    this.electron.ipcRenderer.send('disconnect');
+    
   }
 
-  xxx() {
-    const v = this.theForm.valueChanges as EventEmitter<any>;
-    v.emit({ ...this.theForm.value, submitted: true });
+  /**  Show help panel */
+  help() {
+    this.router.navigate(['help']);
   }
 
 }

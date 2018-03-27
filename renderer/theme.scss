@@ -8,6 +8,18 @@ $custom-theme: mat-dark-theme($custom-primary, $custom-accent);
 
 @include angular-material-theme($custom-theme);
 
+:root {
+  --primary-color: var(--paper-blue-400);
+  --accent-color: var(--paper-green-400);
+  --text-color: var(--paper-grey-100);
+  --background-color: var(--paper-grey-900);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
 .tn3270 {
   color: var(--paper-green-400);
   font-size: 20px;

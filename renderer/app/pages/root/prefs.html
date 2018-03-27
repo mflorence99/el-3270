@@ -1,0 +1,84 @@
+<h1>
+  <i class="fas fa-cog"></i>
+  3270 Setup
+</h1>
+
+<form
+  [formGroup]="prefsForm"
+  novalidate>
+
+  <div class="hostAndPort">
+
+    <mat-form-field>
+      <input
+        formControlName="host"
+        matInput
+        placeholder="Host Name or IP"
+        type="text">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input
+        formControlName="port"
+        matInput
+        placeholder="Port"
+        type="number">
+    </mat-form-field>
+
+    <ng-container *ngIf="prefsForm.get('port').errors as portErrors">
+
+      <mat-error *ngIf="portErrors.min">
+        Port must not be lower than {{ portErrors.min.min }}
+      </mat-error>
+
+      <mat-error *ngIf="portErrors.max">
+        Port must not be greater than {{ portErrors.max.max }}
+      </mat-error>
+
+    </ng-container>
+
+  </div>
+
+  <mat-radio-group
+    class="model"
+    formControlName="model">
+
+    <b>Select 3270 Model to Emulate</b>
+
+    <mat-radio-button value="IBM-3278-1-E">
+      IBM-3278-1 <i> &mdash; 80 x 12</i>
+    </mat-radio-button>
+    <mat-radio-button value="IBM-3278-2-E">
+      IBM-3278-2 <i> &mdash; 80 x 24</i>
+    </mat-radio-button>
+    <mat-radio-button value="IBM-3278-3-E">
+      IBM-3278-3 <i> &mdash; 80 x 32</i>
+    </mat-radio-button>
+    <mat-radio-button value="IBM-3278-4-E">
+      IBM-3278-4 <i> &mdash; 80 x 43</i>
+    </mat-radio-button>
+    <mat-radio-button value="IBM-3278-5-E">
+      IBM-3278-5 <i> &mdash; 132 x 27</i>
+    </mat-radio-button>
+
+  </mat-radio-group>
+
+  <div class="okAndCancel">
+
+    <a
+      (click)="close()"
+      mat-button>
+      Cancel
+    </a>
+
+    <button
+      [disabled]="prefsForm.invalid"
+      color="primary"
+      mat-raised-button
+      type="submit">
+      OK
+    </button>
+
+  </div>
+
+</form>

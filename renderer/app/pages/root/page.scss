@@ -4,27 +4,29 @@
   overflow: auto;
 }
 
-form {
-  display: grid;
-  grid-gap: 16px;
-  grid-template-columns: 1fr;
-  padding: 16px;
-  width: 300px;
-}
+lib-drawer-container {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  width: 100%;
 
-lib-drawer-panel {
-  background-color: var(--paper-grey-900);
-  padding: 16px;
+  --nav-height: 48px;
 
-  &[position=left],
-  &[position=right] {
+  .content {
+    height: calc(100% - var(--nav-height));
+  }
+
+  lib-drawer-panel {
+    background-color: var(--background-color);
     width: 300px;
   }
 
-  &[position=top],
-  &[position=bottom] {
-    height: 240px;
-    width: 480px;
+  nav {
+    align-content: center;
+    display: grid;
+    grid-template-columns: auto auto auto 1fr auto;
+    height: var(--nav-height);
+    padding: 4px;
   }
 
 }

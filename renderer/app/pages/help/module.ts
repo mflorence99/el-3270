@@ -1,15 +1,13 @@
 import { BarrelModule } from '../../barrel';
+import { HelpPageComponent } from './page';
 import { NgModule } from '@angular/core';
-import { PrefsComponent } from './prefs';
-import { RootPageComponent } from './page';
 
 /**
- * Root page module
+ * Noop page module
  */
 
 const COMPONENTS = [
-  PrefsComponent,
-  RootPageComponent
+  HelpPageComponent
 ];
 
 const MODULES = [
@@ -23,7 +21,7 @@ const MODULES = [
   ],
 
   exports: [
-    RootPageComponent
+    HelpPageComponent
   ],
 
   imports: [
@@ -32,4 +30,4 @@ const MODULES = [
 
 })
 
-export class RootPageModule { }
+export class HelpPageModule { }

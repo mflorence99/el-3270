@@ -25,7 +25,11 @@
         "../node_modules/ellib/lib/assets/theme.css",
         "theme.scss"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/hammerjs/hammer.min.js",
+        "../node_modules/marked/marked.min.js",
+        "../node_modules/numeral/min/numeral.min.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

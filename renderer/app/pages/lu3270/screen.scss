@@ -1,0 +1,17 @@
+:host {
+  color: var(--lu3270-color);
+  display: block;
+  font-family: '3270 Font';
+  font-size: 18px;
+  overflow: auto;
+  transform: scale(1);
+  transform-origin: top left;
+}
+
+.cells {
+  align-items: start;
+  display: grid;
+  grid-template-columns: repeat(80, auto);
+  grid-template-rows: repeat(43, auto);
+  justify-content: center;
+}

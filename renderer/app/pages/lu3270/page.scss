@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  el3270-keyboard {
+    flex-shrink: 0;
+  }
+
+  el3270-screen {
+    flex-grow: 1;
+  }
+
+  el3270-statusbar {
+    flex-shrink: 0;
+  }
+
+}

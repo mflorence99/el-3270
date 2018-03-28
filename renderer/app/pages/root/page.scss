@@ -1,7 +1,6 @@
 :host {
   display: block;
   height: 100%;
-  overflow: auto;
 }
 
 lib-drawer-container {
@@ -24,7 +23,7 @@ lib-drawer-container {
   nav {
     align-content: center;
     display: grid;
-    grid-template-columns: auto auto auto 1fr auto;
+    grid-template-columns: auto auto 1fr auto auto;
     height: var(--nav-height);
     padding: 4px;
   }

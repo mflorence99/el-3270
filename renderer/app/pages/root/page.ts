@@ -18,12 +18,12 @@ export class RootPageComponent {
 
   /** Connect to host */
   connect() {
-    this.router.navigate(['screen']);
+    this.router.navigate(['lu3270']);
   }
 
   /** Disconnect from host */
   disconnect() {
-    
+
   }
 
   /**  Show help panel */

@@ -32,7 +32,8 @@ export class PrefsComponent implements OnInit {
     this.prefsForm = this.formBuilder.group({
       host: ['', Validators.required],
       port: ['', [Validators.required, Validators.min(23), Validators.max(65535)]],
-      model: ['', Validators.required]
+      model: ['', Validators.required],
+      color: ['', Validators.required]
     });
   }
 

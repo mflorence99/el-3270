@@ -9,7 +9,7 @@ import { LU3270 } from 'tn3270/lib';
 let theLU3270: LU3270, theWindow: BrowserWindow;
 
 app.on('ready', () => {
-  theWindow = new BrowserWindow({width: 1024, height: 800});
+  theWindow = new BrowserWindow({width: 832, height: 1024});
   theWindow.loadURL('http://localhost:4200');
   // theWindow.setMenu(null);
   theWindow.webContents.openDevTools();

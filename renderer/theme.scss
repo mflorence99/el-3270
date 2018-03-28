@@ -1,26 +1,46 @@
 @import '~@angular/material/theming';
 @include mat-core();
 
+//  Custom Angulat Material theme
+
 $custom-primary: mat-palette($mat-blue, 400, 400, 600);
 $custom-accent:  mat-palette($mat-green, 400, 200, 600);
-
-$custom-theme: mat-dark-theme($custom-primary, $custom-accent);
+$custom-warn:  mat-palette($mat-orange, 400, 200, 600);
+$custom-theme: mat-dark-theme($custom-primary, $custom-accent, $custom-warn);
 
 @include angular-material-theme($custom-theme);
 
-:root {
-  --primary-color: var(--paper-blue-400);
-  --accent-color: var(--paper-green-400);
-  --text-color: var(--paper-grey-100);
-  --background-color: var(--paper-grey-900);
+// Bridge from Angular Material variables to CSS variables
+
+::-webkit-scrollbar {
+  display: none;
 }
+
+:root {
+  --primary-color: var(--mat-blue-400);
+  --accent-color: var(--mat-green-400);
+  --warn-color: var(--mat-orange-400);
+  --text-color: var(--mat-grey-100);
+  --background-color: var(--mat-grey-900);
+  --lu3270-color: var(--mat-green-300);
+  --lu3270-highlight-color: var(--mat-green-400);
+}
+
+// Basic styling
 
 body {
   background-color: var(--background-color);
   color: var(--text-color);
 }
 
-.tn3270 {
-  color: var(--paper-green-400);
-  font-size: 20px;
+.lu3270 {
+  color: var(--lu3270-color);
+  font-family: '3270 Font';
+  font-size: 18px;
+  font-weight: 500;
+
+  .highlight {
+    color: var(--lu3270-highlight-color);
+  }
+
 }

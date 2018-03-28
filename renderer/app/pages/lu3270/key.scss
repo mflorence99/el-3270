@@ -1,0 +1,20 @@
+:host {
+  border-color: var(--text-color);
+  border-style: solid;
+  border-radius: 8px;
+  border-width: 2px;
+  color: var(--text-color);
+  cursor: pointer;
+  display: block;
+  height: 32px;
+  line-height: 32px;
+  margin: 4px;
+  overflow: hidden;
+  text-align: center;
+  width: 48px;
+
+  :hover {
+    background-color: var(--text-color);
+    color: var(--background-color);
+  }
+}

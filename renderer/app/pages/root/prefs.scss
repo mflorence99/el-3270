@@ -4,14 +4,38 @@
   padding: 16px;
 }
 
-::-webkit-scrollbar {
-  display: none;
-}
-
 form {
   display: grid;
   grid-gap: 16px;
   grid-template-columns: 1fr;
+
+  .color {
+    display: grid;
+    grid-gap: 8px;
+    grid-template-columns: auto;
+
+    .blue {
+      color: var(--mat-blue-300);
+      b {
+        color: var(--mat-blue-400);
+      }
+    }
+
+    .green {
+      color: var(--mat-green-300);
+      b {
+        color: var(--mat-green-400);
+      }
+    }
+
+    .orange {
+      color: var(--mat-orange-300);
+      b {
+        color: var(--mat-orange-400);
+      }
+    }
+
+  }
 
   .hostAndPort {
     display: grid;
@@ -32,7 +56,7 @@ form {
     i {
       font-size: 0.8em;
     }
-    
+
   }
 
   .okAndCancel {

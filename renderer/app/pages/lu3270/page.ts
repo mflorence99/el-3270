@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 
 /**
- * Screen page
+ * LU3270 page
  */
 
 @Component({
-  selector: 'el3270-screen',
+  selector: 'el3270-lu3270',
   styleUrls: ['page.scss'],
   templateUrl: 'page.html'
 })
 
-export class ScreenPageComponent { }
+export class LU3270PageComponent {
+
+}

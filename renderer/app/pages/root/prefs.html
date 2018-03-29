@@ -4,7 +4,9 @@
 </h1>
 
 <form
+  (submit)="close()"
   [formGroup]="prefsForm"
+  [libRxfSubmit]="prefsForm"
   novalidate>
 
   <div class="hostAndPort">
@@ -69,26 +71,20 @@
 
     <b>Select Default 3270 Color</b>
 
-    <mat-radio-button>
-      <span
-        class="lu3270 green"
-        value="green">
+    <mat-radio-button value="green">
+      <span  class="lu3270 green"  >
         <b>CUSTOMER NUM:</b> 123456
       </span>
     </mat-radio-button>
 
-    <mat-radio-button>
-      <span
-        class="lu3270 blue"
-        value="blue">
+    <mat-radio-button value="blue">
+      <span   class="lu3270 blue">
         <b>CUSTOMER NUM:</b> 123456
       </span>
     </mat-radio-button>
 
-    <mat-radio-button>
-      <span
-        class="lu3270 orange"
-        value="orange">
+    <mat-radio-button value="orange">
+      <span class="lu3270 orange">
         <b>CUSTOMER NUM:</b> 123456
       </span>
     </mat-radio-button>

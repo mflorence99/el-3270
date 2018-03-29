@@ -1,10 +1,15 @@
 :host {
   display: block;
-  margin: 8px;
+  transition: max-height 0.5s ease-out;
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+.keyboard {
+  padding: 8px;
+    
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
 }

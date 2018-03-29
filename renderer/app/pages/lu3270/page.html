@@ -1,5 +1,16 @@
-<el3270-screen></el3270-screen>
+<el3270-screen
+  [layout]="ctrl.layout$ | async"
+  [prefs]="ctrl.prefs$ | async">
+</el3270-screen>
 
-<el3270-statusbar></el3270-statusbar>
+<el3270-statusbar>
 
-<el3270-keyboard></el3270-keyboard>
+</el3270-statusbar>
+
+<el3270-keyboard
+  [layout]="ctrl.layout$ | async">
+</el3270-keyboard>
+
+<el3270-lu3270-ctrl
+  #ctrl>
+</el3270-lu3270-ctrl>

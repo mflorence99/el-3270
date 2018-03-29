@@ -2,6 +2,7 @@ import { BarrelModule } from '../../barrel';
 import { CellComponent } from './cell';
 import { KeyComponent } from './key';
 import { KeyboardComponent } from './keyboard';
+import { LU3270CtrlComponent } from './ctrl';
 import { LU3270PageComponent } from './page';
 import { NgModule } from '@angular/core';
 import { ScreenComponent } from './screen';
@@ -15,6 +16,7 @@ const COMPONENTS = [
   CellComponent,
   KeyboardComponent,
   KeyComponent,
+  LU3270CtrlComponent,
   LU3270PageComponent,
   ScreenComponent,
   StatusbarComponent

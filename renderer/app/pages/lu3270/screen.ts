@@ -1,5 +1,9 @@
-import { AfterViewInit, Component, ElementRef, HostListener } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input } from '@angular/core';
 
+import { LayoutStateModel } from '../../state/layout';
+import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
+import { OnChange } from 'ellib/lib/decorators/onchange';
+import { PrefsStateModel } from '../../state/prefs';
 import { debounce } from 'ellib/lib/utils';
 
 /**
@@ -7,23 +11,30 @@ import { debounce } from 'ellib/lib/utils';
  */
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'el3270-screen',
   styleUrls: ['screen.scss'],
   templateUrl: 'screen.html'
 })
 
-export class ScreenComponent implements AfterViewInit {
+export class ScreenComponent extends LifecycleComponent
+                             implements AfterViewInit {
 
-  numCols = 80;
-  numRows = 43;
+  @Input() layout = {} as LayoutStateModel;
+  @Input() prefs = {} as PrefsStateModel;
 
-  cells = new Array(this.numCols * this.numRows);
+  numCols = 0;
+  numRows = 0;
+
+  cells = [];
 
   private el: HTMLElement;
   private setup: Function;
 
   /** ctor */
   constructor(private element: ElementRef) {
+    super();
+    // scale 3270 display for best fit
     this.setup = debounce(() => {
       // NOTE: these are magic numbers for the 3270 font based on a nominal
       // 18px size and a hack that forces the padding into the stylesheet
@@ -42,6 +53,61 @@ export class ScreenComponent implements AfterViewInit {
 
   @HostListener('window:resize') onResize() {
     this.setup();
+  }
+
+  // bind OnChange handlers
+
+  @OnChange('layout') updateLayout() {
+    this.setup();
+  }
+
+  @OnChange('prefs') updatePrefs() {
+    if (this.prefs) {
+      // this is the color
+      const style = document.documentElement.style;
+      switch (this.prefs.color) {
+        case 'blue':
+          style.setProperty('--lu3270-color', 'var(--mat-blue-300)');
+          style.setProperty('--lu3270-highlight-color', 'var(--mat-blue-400)');
+          break;
+        case 'green':
+          style.setProperty('--lu3270-color', 'var(--mat-green-300)');
+          style.setProperty('--lu3270-highlight-color', 'var(--mat-green-400)');
+          break;
+        case 'orange':
+          style.setProperty('--lu3270-color', 'var(--mat-orange-300)');
+          style.setProperty('--lu3270-highlight-color', 'var(--mat-orange-400)');
+          break;
+      }
+      // this is the model
+      switch (this.prefs.model) {
+        case 'IBM-3278-1-E':
+          this.numCols = 80;
+          this.numRows = 12;
+          break;
+        case 'IBM-3278-2-E':
+          this.numCols = 80;
+          this.numRows = 24;
+          break;
+        case 'IBM-3278-3-E':
+          this.numCols = 80;
+          this.numRows = 32;
+          break;
+        case 'IBM-3278-4-E':
+          this.numCols = 80;
+          this.numRows = 43;
+          break;
+        case 'IBM-3278-5-E':
+          this.numCols = 132;
+          this.numRows = 27;
+          break;
+      }
+      style.setProperty('--lu3270-cols', String(this.numCols));
+      style.setProperty('--lu3270-rows', String(this.numRows));
+      // NOTE: temporary
+      this.cells = new Array(this.numCols * this.numRows);
+      this.setup();
+    }
   }
 
   // lifecycle methods

@@ -17,13 +17,20 @@ $custom-theme: mat-dark-theme($custom-primary, $custom-accent, $custom-warn);
 }
 
 :root {
+
   --primary-color: var(--mat-blue-400);
   --accent-color: var(--mat-green-400);
   --warn-color: var(--mat-orange-400);
+
   --text-color: var(--mat-grey-100);
   --background-color: var(--mat-grey-900);
+
   --lu3270-color: var(--mat-green-300);
   --lu3270-highlight-color: var(--mat-green-400);
+
+  --lu3270-cols: 80;
+  --lu3270-rows: 12;
+  
 }
 
 // Basic styling

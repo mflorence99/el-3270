@@ -1,7 +1,9 @@
 import { BarrelModule } from '../../barrel';
 import { NgModule } from '@angular/core';
 import { PrefsComponent } from './prefs';
+import { RootCtrlComponent } from './ctrl';
 import { RootPageComponent } from './page';
+import { ToolbarComponent } from './toolbar';
 
 /**
  * Root page module
@@ -9,7 +11,9 @@ import { RootPageComponent } from './page';
 
 const COMPONENTS = [
   PrefsComponent,
-  RootPageComponent
+  RootCtrlComponent,
+  RootPageComponent,
+  ToolbarComponent
 ];
 
 const MODULES = [

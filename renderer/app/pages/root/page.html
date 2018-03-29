@@ -1,46 +1,33 @@
 <lib-drawer-container>
 
-  <nav>
-
-    <button
-      (click)="connect()"
-      mat-icon-button>
-      <i class="fas fa-desktop fa-lg"></i>
-    </button>
-
-    <button
-      (click)="disconnect()"
-      mat-icon-button>
-      <i class="fas fa-power-off fa-lg"></i>
-    </button>
-
-    <div>&nbsp;</div>
-
-    <button
-      (click)="prefs.open()"
-      mat-icon-button>
-      <i class="fas fa-cog fa-lg"></i>
-    </button>
-
-    <button
-      (click)="help()"
-      mat-icon-button>
-      <i class="fas fa-question-circle fa-lg"></i>
-    </button>
-
-  </nav>
+  <el3270-toolbar
+    (connect)="ctrl.connect()"
+    (disconnect)="ctrl.disconnect()"
+    (openPrefs)=prefsDrawer.open()
+    (showHelp)="ctrl.showHelp()"
+    (showKeyboard)="ctrl.showKeyboard($event)"
+    [layout]="ctrl.layout$ | async"
+    [prefs]="ctrl.prefs$ | async">
+  </el3270-toolbar>
 
   <lib-animated-router-outlet
     class="content">
   </lib-animated-router-outlet>
 
-
   <lib-drawer-panel
-    #prefs
+    #prefsDrawer
     position="right">
 
-    <el3270-prefs></el3270-prefs>
+    <el3270-prefs
+      [prefs]="ctrl.prefs$ | async"
+      #prefs>
+    </el3270-prefs>
 
   </lib-drawer-panel>
 
 </lib-drawer-container>
+
+<el3270-root-ctrl
+  [prefs]="prefs.prefsForm.valueChanges | async"
+  #ctrl>
+</el3270-root-ctrl>

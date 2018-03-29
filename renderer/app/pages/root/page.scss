@@ -15,17 +15,13 @@ lib-drawer-container {
     height: calc(100% - var(--nav-height));
   }
 
+  el3270-toolbar {
+    height: var(--nav-height);
+  }
+
   lib-drawer-panel {
     background-color: var(--background-color);
     width: 300px;
-  }
-
-  nav {
-    align-content: center;
-    display: grid;
-    grid-template-columns: auto auto 1fr auto auto;
-    height: var(--nav-height);
-    padding: 4px;
   }
 
 }

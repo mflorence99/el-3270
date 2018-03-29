@@ -1,3 +1,4 @@
+import { NgxsStoragePluginModule, StorageOption } from '@ngxs/storage-plugin';
 import { RouterModule, Routes } from '@angular/router';
 
 import { BarrelModule } from './barrel';
@@ -6,8 +7,11 @@ import { HelpPageModule } from './pages/help/module';
 import { LU3270PageComponent } from './pages/lu3270/page';
 import { LU3270PageModule } from './pages/lu3270/module';
 import { NgModule } from '@angular/core';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { NgxsModule } from '@ngxs/store';
 import { RootPageComponent } from './pages/root/page';
 import { RootPageModule } from './pages/root/module';
+import { states } from './state/app';
 
 /**
  * el-3270 module definition
@@ -41,6 +45,15 @@ const SERVICES = [ ];
 
   imports: [
     ...MODULES,
+    NgxsModule.forRoot(states),
+    NgxsLoggerPluginModule.forRoot({
+      collapsed: true,
+      logger: console
+    }),
+    NgxsStoragePluginModule.forRoot({
+      key: ['prefs', 'layout'],
+      storage: StorageOption.LocalStorage
+    }),
     RouterModule.forRoot(ROUTES)
   ],
 

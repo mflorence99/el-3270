@@ -1,4 +1,4 @@
-import { MatButtonModule, MatCheckboxModule, MatInputModule, MatRadioModule } from '@angular/material';
+import { MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatTooltipModule } from '@angular/material';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
@@ -19,9 +19,12 @@ const MODULES = [
   CommonModule,
   LibModule,
   MatButtonModule,
+  MatButtonToggleModule,
   MatCheckboxModule,
   MatInputModule,
   MatRadioModule,
+  MatSlideToggleModule,
+  MatTooltipModule,
   NgxElectronModule,
   ReactiveFormsModule,
   RouterModule

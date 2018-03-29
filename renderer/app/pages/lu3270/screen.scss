@@ -11,7 +11,7 @@
 .cells {
   align-items: start;
   display: grid;
-  grid-template-columns: repeat(80, auto);
-  grid-template-rows: repeat(43, auto);
+  grid-template-columns: repeat(var(--lu3270-cols), auto);
+  grid-template-rows: repeat(var(--lu3270-rows), auto);
   justify-content: center;
 }

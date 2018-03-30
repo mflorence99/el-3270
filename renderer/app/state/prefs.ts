@@ -10,6 +10,8 @@ export interface PrefsStateModel {
   host: string;
   port: number;
   model: string;
+  numCols: number;
+  numRows: number;
   color: string;
   submitted?: boolean;
 }
@@ -22,7 +24,32 @@ export interface PrefsStateModel {
   @Action(UpdatePrefs)
   updatePrefs({ getState, setState }: StateContext<PrefsStateModel>,
               { payload }: UpdatePrefs) {
-    setState({...getState(), ...payload});
+    // deduce row, cols from model
+    let numCols = 0;
+    let numRows = 0;
+    switch (payload.model) {
+      case 'IBM-3278-1-E':
+        numCols = 80;
+        numRows = 12;
+        break;
+      case 'IBM-3278-2-E':
+        numCols = 80;
+        numRows = 24;
+        break;
+      case 'IBM-3278-3-E':
+        numCols = 80;
+        numRows = 32;
+        break;
+      case 'IBM-3278-4-E':
+        numCols = 80;
+        numRows = 43;
+        break;
+      case 'IBM-3278-5-E':
+        numCols = 132;
+        numRows = 27;
+        break;
+    }
+    setState({...getState(), ...payload, numCols, numRows});
   }
 
 }

@@ -23,9 +23,6 @@ export class ScreenComponent extends LifecycleComponent
   @Input() layout = {} as LayoutStateModel;
   @Input() prefs = {} as PrefsStateModel;
 
-  numCols = 0;
-  numRows = 0;
-
   cells = [];
 
   private el: HTMLElement;
@@ -39,8 +36,8 @@ export class ScreenComponent extends LifecycleComponent
       // NOTE: these are magic numbers for the 3270 font based on a nominal
       // 18px size and a hack that forces the padding into the stylesheet
       this.el.style.padding = '8px 16px 16px 8px';
-      const cx = (this.numCols * 9.65625) + 32;
-      const cy = (this.numRows * 21) + 16;
+      const cx = (this.prefs.numCols * 9.65625) + 32;
+      const cy = (this.prefs.numRows * 21) + 16;
       const scaleX = this.el.offsetWidth / cx;
       const scaleY = this.el.offsetHeight / cy;
       if (scaleX < scaleY)
@@ -63,7 +60,6 @@ export class ScreenComponent extends LifecycleComponent
 
   @OnChange('prefs') updatePrefs() {
     if (this.prefs) {
-      // this is the color
       const style = document.documentElement.style;
       switch (this.prefs.color) {
         case 'blue':
@@ -79,33 +75,10 @@ export class ScreenComponent extends LifecycleComponent
           style.setProperty('--lu3270-highlight-color', 'var(--mat-orange-400)');
           break;
       }
-      // this is the model
-      switch (this.prefs.model) {
-        case 'IBM-3278-1-E':
-          this.numCols = 80;
-          this.numRows = 12;
-          break;
-        case 'IBM-3278-2-E':
-          this.numCols = 80;
-          this.numRows = 24;
-          break;
-        case 'IBM-3278-3-E':
-          this.numCols = 80;
-          this.numRows = 32;
-          break;
-        case 'IBM-3278-4-E':
-          this.numCols = 80;
-          this.numRows = 43;
-          break;
-        case 'IBM-3278-5-E':
-          this.numCols = 132;
-          this.numRows = 27;
-          break;
-      }
-      style.setProperty('--lu3270-cols', String(this.numCols));
-      style.setProperty('--lu3270-rows', String(this.numRows));
+      style.setProperty('--lu3270-cols', String(this.prefs.numCols));
+      style.setProperty('--lu3270-rows', String(this.prefs.numRows));
       // NOTE: temporary
-      this.cells = new Array(this.numCols * this.numRows);
+      this.cells = new Array(this.prefs.numCols * this.prefs.numRows);
       this.setup();
     }
   }

@@ -1,7 +1,7 @@
 import { BrowserWindow, app, ipcMain } from 'electron';
 
 import { Subscription } from 'rxjs/Subscription';
-import { Tn3270 } from 'tn3270/lib';
+import { Tn3270 } from 'tn3270/lib/tn3270';
 
 /**
  * All the is experimental

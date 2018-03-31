@@ -35,6 +35,13 @@ form {
       }
     }
 
+    .white {
+      color: var(--mat-grey-100);
+      b {
+        color: white;
+      }
+    }
+
   }
 
   .hostAndPort {

@@ -1,5 +1,4 @@
 import { BarrelModule } from '../../barrel';
-import { CellComponent } from './cell';
 import { KeyComponent } from './key';
 import { KeyboardComponent } from './keyboard';
 import { LU3270CtrlComponent } from './ctrl';
@@ -13,7 +12,6 @@ import { StatusbarComponent } from './statusbar';
  */
 
 const COMPONENTS = [
-  CellComponent,
   KeyboardComponent,
   KeyComponent,
   LU3270CtrlComponent,

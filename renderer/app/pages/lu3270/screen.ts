@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 import { CursorAt } from '../../state/status';
+import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
 import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
 import { OnChange } from 'ellib/lib/decorators/onchange';
@@ -36,6 +37,7 @@ export class ScreenComponent extends LifecycleComponent
 
   /** ctor */
   constructor(private element: ElementRef,
+              private lu3270: LU3270Service,
               private store: Store) {
     super();
     // scale 3270 display for best fit
@@ -57,8 +59,43 @@ export class ScreenComponent extends LifecycleComponent
   }
 
   /** Position the cursor based on a mouse click */
-  cursorAt(cursorAt: number) {
-    this.store.dispatch(new CursorAt(cursorAt));
+  cursorAt(cellID: string) {
+    if (cellID && cellID.startsWith('cell'))
+      this.store.dispatch(new CursorAt(parseInt(cellID.substring(4), 10)));
+  }
+
+  /** Handle keystrokes */
+  keystroke(event: KeyboardEvent) {
+    console.log(event);
+    if (event.code.startsWith('Arrow')) {
+      const max = this.prefs.numCols * this.prefs.numRows;
+      let cursorAt;
+      switch (event.code) {
+        case 'ArrowDown':
+          cursorAt = this.status.cursorAt + this.prefs.numCols;
+          if (cursorAt >= max)
+            cursorAt = this.status.cursorAt % this.prefs.numCols;
+        break;
+        case 'ArrowLeft':
+          cursorAt = this.status.cursorAt - 1;
+          if (cursorAt < 0)
+            cursorAt = max - 1;
+          break;
+        case 'ArrowRight':
+          cursorAt = this.status.cursorAt + 1;
+          if (cursorAt >= max)
+            cursorAt = 0;
+          break;
+        case 'ArrowUp':
+          cursorAt = this.status.cursorAt - this.prefs.numCols;
+          if (cursorAt < 0)
+            cursorAt = (this.status.cursorAt % this.prefs.numCols) + max - this.prefs.numCols;
+          break;
+      }
+      this.store.dispatch(new CursorAt(cursorAt));
+    }
+    else if (event.code === 'Enter')
+      this.lu3270.submit();
   }
 
   // listeners
@@ -88,6 +125,10 @@ export class ScreenComponent extends LifecycleComponent
         case 'orange':
           style.setProperty('--lu3270-color', 'var(--mat-orange-300)');
           style.setProperty('--lu3270-highlight-color', 'var(--mat-orange-400)');
+          break;
+        case 'white':
+          style.setProperty('--lu3270-color', 'var(--mat-grey-100)');
+          style.setProperty('--lu3270-highlight-color', 'white');
           break;
       }
       style.setProperty('--lu3270-cols', String(this.prefs.numCols));

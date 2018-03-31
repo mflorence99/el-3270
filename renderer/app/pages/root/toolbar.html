@@ -1,6 +1,6 @@
 <button
   (click)="this.connect.emit()"
-  [disabled]="!prefs?.host || !prefs?.port"
+  [disabled]="!prefs.host || !prefs.port"
   matTooltip="Connect to host"
   mat-icon-button>
   <i class="fas fa-desktop fa-lg"></i>
@@ -8,7 +8,7 @@
 
 <button
   (click)="this.disconnect.emit()"
-  [disabled]="!prefs?.host || !prefs?.port"
+  [disabled]="!prefs.host || !prefs.port"
   matTooltip="Disonnect from host"
   mat-icon-button>
   <i class="fas fa-power-off fa-lg"></i>
@@ -18,7 +18,7 @@
 
 <mat-button-toggle
   (change)="this.showKeyboard.emit($event.source.checked)"
-  [checked]="layout?.showKeyboard"
+  [checked]="layout.showKeyboard"
   matTooltip="Show keyboard">
   <i class="fas fa-keyboard fa-lg"></i>
 </mat-button-toggle>

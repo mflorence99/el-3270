@@ -22,7 +22,11 @@ export interface StatusStateModel {
 
 @State<StatusStateModel>({
   name: 'status',
-  defaults: {} as StatusStateModel
+  defaults: {
+    connected: false,
+    cursorAt: 0,
+    waiting: false
+  } 
 }) export class StatusState {
 
   @Action(Connected)

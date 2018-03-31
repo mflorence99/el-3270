@@ -37,7 +37,7 @@ export class RootCtrlComponent extends LifecycleComponent {
   /** Connect to host */
   connect() {
     this.prefs$.subscribe((prefs: PrefsStateModel) => {
-      this.lu3270.connect(prefs.host, prefs.port, prefs.model);
+      this.lu3270.connect(prefs.host, prefs.port, prefs.model, prefs.numCols, prefs.numRows);
       this.router.navigate(['lu3270']);
     });
   }

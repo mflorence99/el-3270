@@ -1,11 +1,11 @@
-import { Attributes, Cell, Command, Order, WCC, addressFromBytes } from './data-stream';
+import { AID, Attributes, Cell, Command, Order, WCC, addressFromBytes } from './data-stream';
 import { Connected, CursorAt, Waiting } from '../state/status';
+import { EraseUnprotectedScreen, ReplaceScreen, UpdateScreen } from '../state/screen';
 import { dump, e2a } from './convert';
 
 import { ElectronService } from 'ngx-electron';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { UpdateScreen } from '../state/screen';
 
 /**
  * Encapsulates 3270 device handling
@@ -25,6 +25,8 @@ import { UpdateScreen } from '../state/screen';
 export class LU3270Service {
 
   private connected: boolean;
+  private numCols: number;
+  private numRows: number;
 
   /** ctor */
   constructor(private electron: ElectronService,
@@ -36,37 +38,65 @@ export class LU3270Service {
   /** Connect to host */
   connect(host: string,
           port: number,
-          model: string) {
+          model: string,
+          numCols: number,
+          numRows: number) {
     if (!this.connected) {
+      this.numCols = numCols;
+      this.numRows = numRows;
       this.store.dispatch(new Connected(false));
       this.store.dispatch(new Waiting(true));
       this.electron.ipcRenderer.send('connect', host, port, model);
-      this.connected = true;
     }
   }
 
   /** Disconnect from host */
   disconnect() {
     this.store.dispatch(new Connected(false));
-    this.store.dispatch(new UpdateScreen({ cells: [] }));
+    this.store.dispatch(new ReplaceScreen({ cells: [] }));
     this.electron.ipcRenderer.send('disconnect');
     this.connected = false;
+  }
+
+  /** Submit via ENTER */
+  submit() {
+    this.store.dispatch(new Waiting(true));
+    this.electron.ipcRenderer.send('submit', new Uint8Array([AID.ENTER, 0xFF, 0xEF]));
   }
 
   // private methods
 
   private dataHandler(event: any,
                       data: Uint8Array) {
-    this.store.dispatch(new Connected(true));
+    // if we weren't connected, we are now
     this.store.dispatch(new Waiting(false));
+    if (!this.connected) {
+      this.store.dispatch(new Connected(true));
+      this.connected = true;
+    }
+    // debugging
     dump(data, 'Host -> 3270', true);
+    // breakdown data stream
+    let retVal: {wcc: WCC, cells: Cell[]};
     switch (data[0]) {
       case Command.EAU:
+        retVal = this.processOrdersAndData(data);
+        this.store.dispatch(new EraseUnprotectedScreen({ cells: retVal.cells }));
+        console.log(retVal.wcc.toString());
+        break;
       case Command.EW:
       case Command.EWA:
+        retVal = this.processOrdersAndData(data, true);
+        this.store.dispatch(new ReplaceScreen({ cells: retVal.cells }));
+        console.log(retVal.wcc.toString());
+        break;
       case Command.W:
+        retVal = this.processOrdersAndData(data);
+        this.store.dispatch(new UpdateScreen({ cells: retVal.cells }));
+        console.log(retVal.wcc.toString());
+        break;
       case Command.WSF:
-        this.processOutbound(data);
+        this.processStructuredFields(data);
         break;
       case Command.RB:
       case Command.RM:
@@ -74,6 +104,7 @@ export class LU3270Service {
         console.log(`%cCommand 0x${data[0].toString(16)} oh oh!`, 'color: red');
         break;
     }
+    // TODO: do somehing with the WCC
   }
 
   private errorHandler(event: any,
@@ -81,30 +112,27 @@ export class LU3270Service {
     this.store.dispatch(new Connected(false));
   }
 
-  private processOutbound(data: Uint8Array): void {
-    const command = data[0];
-    let wcc;
-    switch (command) {
-      case Command.WSF:
-        wcc = new WCC();
-        this.processStructuredFields(data.slice(1));
-        break;
-      default:
-        wcc = WCC.fromByte(data[1]);
-        this.processOrdersAndData(data.slice(2));
-        break;
-    }
-  }
-
-  private processOrdersAndData(data: Uint8Array): void {
-    let offset = 0;
-    const cells = [];
+  private processOrdersAndData(data: Uint8Array,
+                               fill = false): {wcc: WCC, cells: Cell[]} {
+    let offset = 2;
     let address = 0;
-    while (offset < data.length) {
+    // NOTE: the command is at [0] and the WCC at [1]
+    const wcc = WCC.fromByte(data[1]);
+    // these are the individual cells on the screen
+    // we fill with dummy protrcted fields on erase
+    const cells = new Array(this.numCols * this.numRows);
+    if (fill) {
+      const filler = new Cell(null, new Attributes(true));
+      cells.fill(filler);
+    }
+    // now build cells from the stream
+    // NOTE: [0xFF, 0xFE] marks end of stream
+    while ((offset < data.length) && (data[offset] !== 0xFF)) {
       const order = data[offset++];
       switch (order) {
         case Order.SF:
           const attributes = Attributes.fromByte(data[offset++]);
+          address += 1; // NOTE: attributes take up space!
           while (data[offset] && (data[offset] >= 0x40)) {
             const value = e2a(new Uint8Array([data[offset++]]));
             cells[address++] = new Cell(value, attributes);
@@ -135,13 +163,19 @@ export class LU3270Service {
           console.log('%cEUA oh oh!', 'color: red');
           break;
         default:
-          console.log(`%cOrder 0x${order.toString(16)} oh oh!`, 'color: red');
+          // if it isn't an order, then treat it as data
+          if (order >= 0x40) {
+            const value = e2a(new Uint8Array([order]));
+            cells[address++] = new Cell(value);
+          }
+          else console.log(`%cOrder 0x${order.toString(16)} oh oh!`, 'color: red');
       }
     }
-    this.store.dispatch(new UpdateScreen({ cells }));
+    return {wcc, cells};
   }
 
-  private processStructuredFields(data: Uint8Array): void {
-  }
+  // NOTE: structured fields in ths context are graphics, synbols etc
+  // we currently completely ignore them
+  private processStructuredFields(data: Uint8Array): void {  }
 
 }

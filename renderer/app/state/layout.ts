@@ -12,7 +12,9 @@ export interface LayoutStateModel {
 
 @State<LayoutStateModel>({
   name: 'layout',
-  defaults: {} as LayoutStateModel
+  defaults: {
+    showKeyboard: false
+  }
 }) export class LayoutState {
 
   @Action(ShowKeyboard)

@@ -1,6 +1,7 @@
 <div
   *ngIf="status.connected" >
   <i class="fas fa-desktop"></i>
+  {{ prefs.model }}
 </div>
 
 <div
@@ -36,5 +37,5 @@
 
 <div
   [ngStyle]="{visibility: (status.connected && (status.cursorAt >= 0))? 'visible' : 'hidden'}">
-  {{ (status.cursorAt / prefs.numCols) + 1 | number:'3.0-0' }}/{{ (status.cursorAt % prefs.numCols) + 1 | number:'3.0-0' }}
+  {{ rowNum() | number:'3.0-0' }}/{{ colNum() | number:'3.0-0' }}
 </div>

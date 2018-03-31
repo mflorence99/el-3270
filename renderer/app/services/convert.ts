@@ -296,6 +296,13 @@ export function dump(data: Uint8Array,
                      title: string,
                      ebcdic = false): void {
   const sliceSize = 32;
+  // formatter
+  const toHex = ((num: number, pad: number) => {
+    const padding = '00000000'.substring(0, pad);
+    const hex = num.toString(16);
+    return padding.substring(0, padding.length - hex.length) + hex;
+  });
+  // dumper
   const dumpSlice = ((bytes: Uint8Array): {hex, str} => {
     let hex = '';
     let str = '';
@@ -303,8 +310,10 @@ export function dump(data: Uint8Array,
     // decode to hex and string equiv
     for (; ix < bytes.length; ix++) {
       const byte = bytes[ix];
-      hex += `${(byte < 16)? '0' : ''}${byte.toString(16)}`;
-      str += ebcdic? e2a(new Uint8Array([byte])) : String.fromCharCode(byte);
+      hex += `${toHex(byte, 2)}`;
+      const char = ebcdic? e2a(new Uint8Array([byte])) : String.fromCharCode(byte);
+      // NOTE: use special character in string as a visual aid to counting
+      str += (char === ' ')? '\u8226' : char;
       if ((ix > 0) && ((ix % 4) === 3))
         hex += ' ';
     }
@@ -321,12 +330,12 @@ export function dump(data: Uint8Array,
   // now iterate over buffer dumping lines
   let offset = 0;
   const total = data.length;
-  console.groupCollapsed(title);
-  console.log('%c00       04       08       12       16       20       24       28        00  04  08  12  16  20  24  28  ', 'font-weight: bold');
+  console.groupCollapsed(`${title} ${ebcdic? '(EBCDIC-encoded)' : ''}`);
+  console.log('%c      00       04       08       0c       10       14       18       1c        00  04  08  0c  10  14  18  1c  ', 'font-weight: bold');
   while (true) {
     const slice = new Uint8Array(data.slice(offset, Math.min(offset + sliceSize, total)));
     const {hex, str} = dumpSlice(slice);
-    console.log(`${hex} %c${str}`, 'color: grey');
+    console.log(`%c${toHex(offset, 4)}: %c${hex} %c${str}`, 'font-weight: bold', 'color: black', 'color: grey');
     // setup for next time
     if (slice.length < sliceSize)
       break;

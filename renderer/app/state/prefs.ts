@@ -18,7 +18,14 @@ export interface PrefsStateModel {
 
 @State<PrefsStateModel>({
   name: 'prefs',
-  defaults: {} as PrefsStateModel
+  defaults: {
+    host: null,
+    port: null,
+    model: 'IBM-3278-4-E',
+    numCols: 80,
+    numRows: 43,
+    color: 'green'
+  }
 }) export class PrefsState {
 
   @Action(UpdatePrefs)

@@ -24,6 +24,16 @@ export class StatusbarComponent  {
   /** ctor */
   constructor(private element: ElementRef) { }
 
+  /** Compute colimn from cursor */
+  colNum(): number {
+    return (this.status.cursorAt % this.prefs.numCols) + 1;
+  }
+
+  /** Compute row from cursor */
+  rowNum(): number {
+    return Math.trunc(this.status.cursorAt / this.prefs.numCols) + 1;
+  }
+
   // bind OnChange handlers
 
   fontSize(fontSize: string) {

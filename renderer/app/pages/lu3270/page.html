@@ -1,10 +1,16 @@
 <el3270-screen
+  (fontSize)="statusbar.fontSize($event)"
   [layout]="ctrl.layout$ | async"
-  [prefs]="ctrl.prefs$ | async">
+  [prefs]="ctrl.prefs$ | async"
+  [screen]="ctrl.screen$ | async"
+  [status]="ctrl.status$ | async">
 </el3270-screen>
 
 <el3270-statusbar
-  [prefs]="ctrl.prefs$ | async">
+  [prefs]="ctrl.prefs$ | async"
+  [screen]="ctrl.screen$ | async"
+  [status]="ctrl.status$ | async"
+  #statusbar>
 </el3270-statusbar>
 
 <el3270-keyboard

@@ -1,9 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
+import { CursorAt } from '../../state/status';
 import { LayoutStateModel } from '../../state/layout';
 import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
 import { OnChange } from 'ellib/lib/decorators/onchange';
 import { PrefsStateModel } from '../../state/prefs';
+import { ScreenStateModel } from '../../state/screen';
+import { StatusStateModel } from '../../state/status';
+import { Store } from '@ngxs/store';
 import { debounce } from 'ellib/lib/utils';
 
 /**
@@ -22,14 +26,17 @@ export class ScreenComponent extends LifecycleComponent
 
   @Input() layout = {} as LayoutStateModel;
   @Input() prefs = {} as PrefsStateModel;
+  @Input() screen = {} as ScreenStateModel;
+  @Input() status = {} as StatusStateModel;
 
-  cells = [];
+  @Output() fontSize = new EventEmitter<string>();
 
   private el: HTMLElement;
   private setup: Function;
 
   /** ctor */
-  constructor(private element: ElementRef) {
+  constructor(private element: ElementRef,
+              private store: Store) {
     super();
     // scale 3270 display for best fit
     this.setup = debounce(() => {
@@ -40,10 +47,18 @@ export class ScreenComponent extends LifecycleComponent
       const cy = (this.prefs.numRows * 21) + 16;
       const scaleX = this.el.offsetWidth / cx;
       const scaleY = this.el.offsetHeight / cy;
+      let fontSize;
       if (scaleX < scaleY)
-        this.el.style.fontSize = `${18 * scaleX}px`;
-      else this.el.style.fontSize = `${18 * scaleY}px`;
+        fontSize = `${18 * scaleX}px`;
+      else fontSize = `${18 * scaleY}px`;
+      this.el.style.fontSize = fontSize;
+      this.fontSize.emit(fontSize);
     }, 250);
+  }
+
+  /** Position the cursor based on a mouse click */
+  cursorAt(cursorAt: number) {
+    this.store.dispatch(new CursorAt(cursorAt));
   }
 
   // listeners
@@ -77,8 +92,6 @@ export class ScreenComponent extends LifecycleComponent
       }
       style.setProperty('--lu3270-cols', String(this.prefs.numCols));
       style.setProperty('--lu3270-rows', String(this.prefs.numRows));
-      // NOTE: temporary
-      this.cells = new Array(this.prefs.numCols * this.prefs.numRows);
       this.setup();
     }
   }

@@ -6,6 +6,7 @@ import { HelpPageComponent } from './pages/help/page';
 import { HelpPageModule } from './pages/help/module';
 import { LU3270PageComponent } from './pages/lu3270/page';
 import { LU3270PageModule } from './pages/lu3270/module';
+import { LU3270Service } from './services/lu3270';
 import { NgModule } from '@angular/core';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxsModule } from '@ngxs/store';
@@ -33,7 +34,9 @@ const ROUTES: Routes = [
   {path: '**',     component: HelpPageComponent}
 ];
 
-const SERVICES = [ ];
+const SERVICES = [
+  LU3270Service
+];
 
 @NgModule({
 

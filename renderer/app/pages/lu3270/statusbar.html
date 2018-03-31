@@ -1,28 +1,40 @@
-<div class="wait">
-  <i class="fas fa-spinner fa-pulse"></i>
+<div
+  *ngIf="status.connected" >
+  <i class="fas fa-desktop"></i>
 </div>
 
-<div class="lu3270 locked">
+<div
+  *ngIf="!status.connected" >
+  <i class="fas fa-power-off"></i>
+</div>
+
+<div
+  [ngStyle]="{visibility: status.waiting? 'visible' : 'hidden'}">
+  <i class="fas fa-spinner fa-pulse"></i>
+  WAIT
+</div>
+
+<div
+  [ngStyle]="{color: 'var(--error-color)', visibility: 'hidden'}">
   <i class="fas fa-times"></i>
   SYSTEM
 </div>
 
 <div>&nbsp;</div>
 
-<div class="lu3270 numeric">
+<div
+  [ngStyle]="{visibility: (status.connected && screen.cells[status.cursorAt]?.attributes.numeric)? 'visible' : 'hidden'}">
   NUM
 </div>
 
-<div class="lu3270 extended">
-  A
-</div>
-
-<div class="color">
-  <i class="fas fa-stop"></i>
+<div
+  [ngStyle]="{visibility: (status.connected && screen.cells[status.cursorAt]?.attributes.protect)? 'visible' : 'hidden'}">
+  PROT
 </div>
 
 <div>&nbsp;</div>
 
-<div class="lu3270 cursor">
-  001/001
+<div
+  [ngStyle]="{visibility: (status.connected && (status.cursorAt >= 0))? 'visible' : 'hidden'}">
+  {{ (status.cursorAt / prefs.numCols) + 1 | number:'3.0-0' }}/{{ (status.cursorAt % prefs.numCols) + 1 | number:'3.0-0' }}
 </div>

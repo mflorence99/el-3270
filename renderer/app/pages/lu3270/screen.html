@@ -1,7 +1,10 @@
 <div class="cells">
 
-  <el3270-cell *ngFor="let cel of cells; let i = index">
-    {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i % 26] }}
+  <el3270-cell
+    (click)="cursorAt(ix)"
+    [ngStyle]="cell?.attributes.toCSS(ix === status.cursorAt)"
+    *ngFor="let cell of screen.cells; let ix = index">
+    {{ (cell && cell.value)? cell.value : '\u00a0' }}
   </el3270-cell>
 
 </div>

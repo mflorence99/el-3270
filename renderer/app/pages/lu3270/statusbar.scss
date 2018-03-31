@@ -1,17 +1,15 @@
 :host {
   align-content: center;
   border-top: 1px solid var(--lu3270-color);
+  color: var(--lu3270-color);
   display: grid;
-  grid-gap: 8px;
-  grid-template-columns: auto auto 1fr auto auto auto 1fr auto;
-  height: 32px;
-  padding: 8px;
+  font-family: '3270 Font';
+  font-size: 18px;
+  grid-gap: 16px;
+  grid-template-columns: auto auto auto 1fr auto auto 1fr auto;
+  padding: 8px 16px 16px 8px;
 }
 
 .locked {
   color: var(--error-color);
-}
-
-.wait {
-  color: var(--lu3270-color);
 }

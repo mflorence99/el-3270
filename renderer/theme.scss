@@ -30,7 +30,7 @@ $custom-theme: mat-dark-theme($custom-primary, $custom-accent, $custom-warn);
 
   --lu3270-cols: 80;
   --lu3270-rows: 12;
-  
+
 }
 
 // Basic styling
@@ -48,6 +48,13 @@ body {
 
   .highlight {
     color: var(--lu3270-highlight-color);
+    font-weight: 900;
   }
 
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }

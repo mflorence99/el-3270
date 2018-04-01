@@ -60,51 +60,30 @@ export class ScreenComponent extends LifecycleComponent
   }
 
   /** Position the cursor based on a mouse click */
-  cursorAt(cellID: string) {
+  cursorAt(cellID: string): void {
     if (cellID && cellID.startsWith('cell'))
       this.store.dispatch(new CursorAt(parseInt(cellID.substring(4), 10)));
   }
 
   /** Handle keystrokes */
-  keystroke(event: KeyboardEvent) {
+  keystroke(event: KeyboardEvent): void {
     console.log(event);
     if (event.code.startsWith('Arrow')) {
-      const max = this.prefs.numCols * this.prefs.numRows;
-      let cursorAt;
-      switch (event.code) {
-        case 'ArrowDown':
-          cursorAt = this.status.cursorAt + this.prefs.numCols;
-          if (cursorAt >= max)
-            cursorAt = this.status.cursorAt % this.prefs.numCols;
-        break;
-        case 'ArrowLeft':
-          cursorAt = this.status.cursorAt - 1;
-          if (cursorAt < 0)
-            cursorAt = max - 1;
-          break;
-        case 'ArrowRight':
-          cursorAt = this.status.cursorAt + 1;
-          if (cursorAt >= max)
-            cursorAt = 0;
-          break;
-        case 'ArrowUp':
-          cursorAt = this.status.cursorAt - this.prefs.numCols;
-          if (cursorAt < 0)
-            cursorAt = (this.status.cursorAt % this.prefs.numCols) + max - this.prefs.numCols;
-          break;
-      }
-      this.store.dispatch(new CursorAt(cursorAt));
+      const cursorOp: any = event.code.substring(5).toLowerCase();
+      this.lu3270.cursorTo(this.status.cursorAt, cursorOp, this.prefs.numCols, this.prefs.numRows);
     }
     else if (event.code === 'Backspace') {
       const cursorAt = this.status.cursorAt;
       this.store.dispatch(new ClearCellValue(cursorAt));
     }
     else if (event.code === 'Enter')
-      this.lu3270.submit(AID.ENTER);
+      this.lu3270.submit(AID.ENTER, this.status.cursorAt, this.screen.cells);
     else if (event.code === 'Escape')
       this.store.dispatch([new ErrorMessage(''), new KeyboardLocked(false)]);
-    else if (event.code.match(/F[0-9]+/))
-      this.lu3270.submit(AIDLookup[`P${event.code}`]);
+    else if (event.code.match(/F[0-9]+/)) {
+      const aid = AIDLookup[`P${event.code}`];
+      this.lu3270.submit(aid, this.status.cursorAt, this.screen.cells);
+    }
     else if (event.key.length === 1) {
       const cursorAt = this.status.cursorAt;
       const value = event.key;

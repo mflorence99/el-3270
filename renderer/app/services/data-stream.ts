@@ -137,7 +137,8 @@ export class Attributes {
  */
 export class Cell {
   constructor(public value: string = null,
-              public attributes: Attributes = new Attributes()) { }
+              public attributes: Attributes = new Attributes(),
+              public id: string = null) { }
 }
 
 /**
@@ -185,7 +186,7 @@ export class WCC {
 /**
  * Calculate a buffer address from 3270 12-bit encoding
  */
-export function addressFromBytes(bytes: Uint8Array): number {
+export function addressFromBytes(bytes: number[]): number {
   let address = bytes[0];
   address &= 0b00111111;
   address = address << 6;
@@ -196,8 +197,8 @@ export function addressFromBytes(bytes: Uint8Array): number {
 /**
  * Calculate 3270 12-bit encoding from buffer address
  */
-export function addressToBytes(address: number): Uint8Array {
-  const bytes = new Uint8Array(2);
+export function addressToBytes(address: number): number[] {
+  const bytes: number[] = [];
   const tr = [
     0x40, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
     0xC8, 0xC9, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F,

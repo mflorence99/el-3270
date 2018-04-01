@@ -52,7 +52,7 @@ export interface ScreenStateModel {
       this.store.dispatch(new KeyboardLocked(true));
     }
     else {
-      cell.attributes.modified = true;
+      cell.attributes.modified = false;
       cell.value = null;
       this.store.dispatch(new CursorAt(payload - 1));
       setState({...updated});

@@ -37,7 +37,7 @@ ipcMain.on('connect', (event: any,
   let sequence = 0;
   theConnection = theTn3270.stream$.subscribe({
     next: (data: Buffer) => {
-      // YES -- I know this is crap!
+      // YES -- I know this is crap
       if (sequence++ === 0)
         theWindow.webContents.send('connected');
       const view = new Uint8Array(data.length);
@@ -58,7 +58,7 @@ ipcMain.on('disconnect', () => {
   }
 });
 
-ipcMain.on('submit', (event: any,
-                      data: Uint8Array) => {
+ipcMain.on('write', (event: any,
+                     data: Uint8Array) => {
   theTn3270.write(data);
 });

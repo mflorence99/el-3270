@@ -8,6 +8,7 @@
     "noUnusedLocals": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "preserveConstEnums": true,
     "target": "es5",
     "typeRoots": [
       "node_modules/@types"

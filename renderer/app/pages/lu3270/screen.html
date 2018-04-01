@@ -1,14 +1,23 @@
 <div
   (click)="cursorAt($event.srcElement?.id)"
   (window:keydown)="keystroke($event)"
+  [ngStyle]="{cursor: status.keyboardLocked? 'not-allowed' : 'default'}"
+  *ngIf="status.connected; else ready"
   class="cells">
 
   <div
     [id]="'cell' + ix"
-    [ngStyle]="cell?.attributes.toCSS(ix === status.cursorAt)"
-    *ngFor="let cell of screen.cells; let ix = index"
-    style="cursor: default">
-    {{ (cell && cell.value)? cell.value : '\u00a0' }}
+    [ngStyle]="cell.attributes.toCSS(ix === status.cursorAt)"
+    *ngFor="let cell of screen.cells; let ix = index">
+    {{ cell.value? cell.value : '\u00a0' }}
   </div>
 
 </div>
+
+<ng-template #ready>
+
+  <div class="lu3270">
+    READY TO CONNECT TO {{ prefs.host }}:{{ prefs.port }} ...
+  </div>
+
+</ng-template>

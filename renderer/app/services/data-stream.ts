@@ -256,6 +256,13 @@ export enum AID {
   PF24    = 0x4C
 }
 
+// NOTE: preserveConstEnums in tsconfig makes this work
+// see https://stackoverflow.com/questions/18111657/
+//       how-does-one-get-the-names-of-typescript-enum-entries
+export const AIDLookup = {};
+for (const aid in AID)
+  AIDLookup[aid] = AID[aid];
+
 export enum Color {
   DEFAULT   = 0x00,
   BLUE      = 0xF1,

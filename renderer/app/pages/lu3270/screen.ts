@@ -1,12 +1,13 @@
+import { AID, AIDLookup } from '../../services/data-stream';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
+import { CursorAt, ErrorMessage, KeyboardLocked } from '../../state/status';
 
-import { CursorAt } from '../../state/status';
 import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
 import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
 import { OnChange } from 'ellib/lib/decorators/onchange';
 import { PrefsStateModel } from '../../state/prefs';
-import { ScreenStateModel } from '../../state/screen';
 import { StatusStateModel } from '../../state/status';
 import { Store } from '@ngxs/store';
 import { debounce } from 'ellib/lib/utils';
@@ -94,8 +95,21 @@ export class ScreenComponent extends LifecycleComponent
       }
       this.store.dispatch(new CursorAt(cursorAt));
     }
+    else if (event.code === 'Backspace') {
+      const cursorAt = this.status.cursorAt;
+      this.store.dispatch(new ClearCellValue(cursorAt));
+    }
     else if (event.code === 'Enter')
-      this.lu3270.submit();
+      this.lu3270.submit(AID.ENTER);
+    else if (event.code === 'Escape')
+      this.store.dispatch([new ErrorMessage(''), new KeyboardLocked(false)]);
+    else if (event.code.match(/F[0-9]+/))
+      this.lu3270.submit(AIDLookup[`P${event.code}`]);
+    else if (event.key.length === 1) {
+      const cursorAt = this.status.cursorAt;
+      const value = event.key;
+      this.store.dispatch(new UpdateCellValue({ cursorAt, value }));
+    }
   }
 
   // listeners

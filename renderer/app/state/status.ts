@@ -10,6 +10,14 @@ export class CursorAt {
   constructor(public readonly payload: number) {}
 }
 
+export class ErrorMessage {
+  constructor(public readonly payload: string) {}
+}
+
+export class KeyboardLocked {
+  constructor(public readonly payload: boolean) {}
+}
+
 export class Waiting {
   constructor(public readonly payload: boolean) {}
 }
@@ -17,6 +25,9 @@ export class Waiting {
 export interface StatusStateModel {
   connected: boolean;
   cursorAt: number;
+  error: boolean;
+  keyboardLocked: boolean;
+  message: string;
   waiting: boolean;
 }
 
@@ -25,8 +36,11 @@ export interface StatusStateModel {
   defaults: {
     connected: false,
     cursorAt: 0,
+    error: false,
+    keyboardLocked: false,
+    message: '',
     waiting: false
-  } 
+  }
 }) export class StatusState {
 
   @Action(Connected)
@@ -39,6 +53,18 @@ export interface StatusStateModel {
   cursorAt({ getState, patchState }: StateContext<StatusStateModel>,
             { payload }: CursorAt) {
     patchState({cursorAt: payload});
+  }
+
+  @Action(ErrorMessage)
+  errorMessage({ getState, patchState }: StateContext<StatusStateModel>,
+               { payload }: ErrorMessage) {
+    patchState({error: !!payload, message: payload});
+  }
+
+  @Action(KeyboardLocked)
+  keyboardLocked({ getState, patchState }: StateContext<StatusStateModel>,
+                 { payload }: KeyboardLocked) {
+    patchState({keyboardLocked: payload});
   }
 
   @Action(Waiting)

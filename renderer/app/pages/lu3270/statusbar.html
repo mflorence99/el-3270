@@ -16,9 +16,9 @@
 </div>
 
 <div
-  [ngStyle]="{color: 'var(--error-color)', visibility: 'hidden'}">
+  [ngStyle]="{color: 'var(--error-color)', visibility: status.error? 'visible' : 'hidden'}">
   <i class="fas fa-times"></i>
-  SYSTEM
+  {{ status.message }}
 </div>
 
 <div>&nbsp;</div>
@@ -32,8 +32,6 @@
   [ngStyle]="{visibility: (status.connected && screen.cells[status.cursorAt]?.attributes.protect)? 'visible' : 'hidden'}">
   PROT
 </div>
-
-<div>&nbsp;</div>
 
 <div
   [ngStyle]="{visibility: (status.connected && (status.cursorAt >= 0))? 'visible' : 'hidden'}">

@@ -1,11 +1,12 @@
-import { AID, Attributes, Cell, Command, Order, WCC, addressFromBytes } from './data-stream';
+import { AID, Attributes, Cell, Command, LT, Order, WCC, addressFromBytes } from './data-stream';
 import { Connected, CursorAt, Waiting } from '../state/status';
 import { EraseUnprotectedScreen, ReplaceScreen, UpdateScreen } from '../state/screen';
-import { dump, e2a } from './convert';
 
 import { ElectronService } from 'ngx-electron';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
+import { dump } from 'ellib/lib/utils';
+import { e2a } from 'ellib/lib/utils/convert';
 
 /**
  * Encapsulates 3270 device handling
@@ -61,7 +62,7 @@ export class LU3270Service {
   /** Submit via ENTER */
   submit() {
     this.store.dispatch(new Waiting(true));
-    this.electron.ipcRenderer.send('submit', new Uint8Array([AID.ENTER, 0xFF, 0xEF]));
+    this.electron.ipcRenderer.send('submit', new Uint8Array([AID.ENTER, ...LT]));
   }
 
   // private methods
@@ -75,28 +76,25 @@ export class LU3270Service {
       this.connected = true;
     }
     // debugging
-    dump(data, 'Host -> 3270', true);
+    dump(data, 'Host -> 3270', true, 'blue');
     // breakdown data stream
     let retVal: {wcc: WCC, cells: Cell[]};
     switch (data[0]) {
       case Command.EAU:
-        retVal = this.processOrdersAndData(data);
+        retVal = this.writeOrdersAndData(data);
         this.store.dispatch(new EraseUnprotectedScreen({ cells: retVal.cells }));
-        console.log(retVal.wcc.toString());
         break;
       case Command.EW:
       case Command.EWA:
-        retVal = this.processOrdersAndData(data, true);
+        retVal = this.writeOrdersAndData(data, true);
         this.store.dispatch(new ReplaceScreen({ cells: retVal.cells }));
-        console.log(retVal.wcc.toString());
         break;
       case Command.W:
-        retVal = this.processOrdersAndData(data);
+        retVal = this.writeOrdersAndData(data);
         this.store.dispatch(new UpdateScreen({ cells: retVal.cells }));
-        console.log(retVal.wcc.toString());
         break;
       case Command.WSF:
-        this.processStructuredFields(data);
+        this.writeStructuredFields(data);
         break;
       case Command.RB:
       case Command.RM:
@@ -112,8 +110,8 @@ export class LU3270Service {
     this.store.dispatch(new Connected(false));
   }
 
-  private processOrdersAndData(data: Uint8Array,
-                               fill = false): {wcc: WCC, cells: Cell[]} {
+  private writeOrdersAndData(data: Uint8Array,
+                             fill = false): {wcc: WCC, cells: Cell[]} {
     let offset = 2;
     let address = 0;
     // NOTE: the command is at [0] and the WCC at [1]
@@ -126,16 +124,23 @@ export class LU3270Service {
       cells.fill(filler);
     }
     // now build cells from the stream
-    // NOTE: [0xFF, 0xFE] marks end of stream
-    while ((offset < data.length) && (data[offset] !== 0xFF)) {
+    // NOTE: LT marks end of stream, but 1st byte of LT is unambiguous
+    while ((offset < data.length) && (data[offset] !== LT[0])) {
       const order = data[offset++];
       switch (order) {
         case Order.SF:
           const attributes = Attributes.fromByte(data[offset++]);
           address += 1; // NOTE: attributes take up space!
-          while (data[offset] && (data[offset] >= 0x40)) {
-            const value = e2a(new Uint8Array([data[offset++]]));
-            cells[address++] = new Cell(value, attributes);
+          while (true) {
+            if (data[offset] === Order.IC) {
+              this.store.dispatch(new CursorAt(address));
+              offset += 1;
+            }
+            else if (data[offset] >= 0x40) {
+              const value = e2a(new Uint8Array([data[offset++]]));
+              cells[address++] = new Cell(value, attributes);
+            }
+            else break;
           }
           break;
         case Order.SFE:
@@ -166,7 +171,7 @@ export class LU3270Service {
           // if it isn't an order, then treat it as data
           if (order >= 0x40) {
             const value = e2a(new Uint8Array([order]));
-            cells[address++] = new Cell(value);
+            cells[address++] = new Cell(value, new Attributes(true));
           }
           else console.log(`%cOrder 0x${order.toString(16)} oh oh!`, 'color: red');
       }
@@ -176,6 +181,6 @@ export class LU3270Service {
 
   // NOTE: structured fields in ths context are graphics, synbols etc
   // we currently completely ignore them
-  private processStructuredFields(data: Uint8Array): void {  }
+  private writeStructuredFields(data: Uint8Array): void {  }
 
 }

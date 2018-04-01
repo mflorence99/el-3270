@@ -12,7 +12,6 @@
 /**
  * Model 3270 field attributes
  */
-
 export class Attributes {
 
   static fromByte(byte: number): Attributes {
@@ -136,7 +135,6 @@ export class Attributes {
  *
  * NOTE: there's one of these for each buffer position
  */
-
 export class Cell {
   constructor(public value: string = null,
               public attributes: Attributes = new Attributes()) { }
@@ -145,7 +143,6 @@ export class Cell {
 /**
  * Model the WCC
  */
-
 export class WCC {
 
   static fromByte(byte: number): WCC {
@@ -188,7 +185,6 @@ export class WCC {
 /**
  * Calculate a buffer address from 3270 12-bit encoding
  */
-
 export function addressFromBytes(bytes: Uint8Array): number {
   let address = bytes[0];
   address &= 0b00111111;
@@ -200,7 +196,6 @@ export function addressFromBytes(bytes: Uint8Array): number {
 /**
  * Calculate 3270 12-bit encoding from buffer address
  */
-
 export function addressToBytes(address: number): Uint8Array {
   const bytes = new Uint8Array(2);
   const tr = [
@@ -217,6 +212,12 @@ export function addressToBytes(address: number): Uint8Array {
   bytes[1] = tr[address &= 0b00111111];
   return bytes;
 }
+
+/**
+ * Common constants
+ */
+
+export const LT = [0xFF, 0xEF];
 
 /**
  * Common types

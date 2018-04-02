@@ -64,7 +64,7 @@ export class LU3270Service {
   cursorTo(cursorAt: number,
            cursorOp: 'down' | 'left' | 'right' | 'up',
            numCols: number,
-           numRows: number): void {
+           numRows: number): number {
     const max = numCols * numRows;
     let cursorTo;
     switch (cursorOp) {
@@ -89,7 +89,7 @@ export class LU3270Service {
           cursorTo = (cursorAt % numCols) + max - numCols;
         break;
     }
-    this.store.dispatch(new CursorAt(cursorAt));
+    return cursorTo;
   }
 
   /** Disconnect from host */
@@ -102,11 +102,10 @@ export class LU3270Service {
   submit(aid: AID,
          cursorAt: number,
          cells: Cell[]): void {
+    const data = this.submitHandler(aid, cursorAt, cells);
     this.store.dispatch(new Waiting(true));
-    // const bytes = [0x5b, 0xf1, 0x11, 0x5b, 0x6b, 0xc8, 0xc5, 0xd9, 0xc3, 0xf0, 0xf1];
-    const toHost = new Uint8Array([aid, ...addressToBytes(cursorAt), ...this.readModified(cells), ...LT]);
-    dump(toHost, '3270 -> Host', true, 'magenta');
-    this.electron.ipcRenderer.send('write', toHost);
+    this.electron.ipcRenderer.send('write', data);
+    this.application.tick();
   }
 
   // private methods
@@ -120,37 +119,23 @@ export class LU3270Service {
 
   private dataHandler(event: any,
                       data: Uint8Array): void {
-    dump(data, 'Host -> 3270', true, 'blue');
-    let retVal: { wcc?: WCC, cells?: Cell[] } = {};
     const actions: any[] = [];
-    switch (data[0]) {
-      case Command.EAU:
-        retVal = this.writeOrdersAndData(data);
-        actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
-        break;
-      case Command.EW:
-      case Command.EWA:
-        retVal = this.writeOrdersAndData(data, true);
-        actions.push(new ReplaceScreen({ cells: retVal.cells }));
-        break;
-      case Command.W:
-        retVal = this.writeOrdersAndData(data);
-        actions.push(new UpdateScreen({ cells: retVal.cells }));
-        break;
-      case Command.WSF:
-        this.writeStructuredFields(data);
-        break;
-      case Command.RB:
-      case Command.RM:
-      case Command.RMA:
-        console.log(`%cCommand 0x${data[0].toString(16)} oh oh!`, 'color: red');
-        break;
+    let slice: Uint8Array;
+    dump(data, 'Host -> 3270', true, 'blue');
+    // NOTE: data from host may be multiple frames delimited by LT
+    for (let ix = 0, iy = 0; ix < data.length; ) {
+      iy = data.indexOf(LT[0], ix);
+      if ((iy !== -1) && (data[iy + 1] === LT[1])) {
+        slice = data.slice(ix, iy);
+        iy += 2;
+      }
+      else {
+        slice = data.slice(ix);
+        iy = data.length;
+      }
+      ix = iy;
+      this.writeCommands(slice, actions);
     }
-    // process the WCC
-    if (retVal.wcc && retVal.wcc.resetMDT)
-      actions.push(new ResetMDT());
-    if (retVal.wcc && retVal.wcc.unlockKeyboard)
-      actions.push(new KeyboardLocked(false));
     // dispatch actions
     this.store.dispatch([new Waiting(false), ...actions]);
     this.application.tick();
@@ -221,6 +206,47 @@ export class LU3270Service {
     return data;
   }
 
+  private submitHandler(aid: AID,
+                        cursorAt: number,
+                        cells: Cell[]): Uint8Array {
+    const data = new Uint8Array([aid, ...addressToBytes(cursorAt), ...this.readModified(cells), ...LT]);
+    dump(data, '3270 -> Host', true, 'magenta');
+    return data;
+  }
+
+  private writeCommands(data: Uint8Array,
+                        actions: any[]): void {
+    let retVal: { wcc?: WCC, cells?: Cell[] } = {};
+    switch (data[0]) {
+      case Command.EAU:
+        retVal = this.writeOrdersAndData(data);
+        actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
+        break;
+      case Command.EW:
+      case Command.EWA:
+        retVal = this.writeOrdersAndData(data, true);
+        actions.push(new ReplaceScreen({ cells: retVal.cells }));
+        break;
+      case Command.W:
+        retVal = this.writeOrdersAndData(data);
+        actions.push(new UpdateScreen({ cells: retVal.cells }));
+        break;
+      case Command.WSF:
+        this.writeStructuredFields(data);
+        break;
+      case Command.RB:
+      case Command.RM:
+      case Command.RMA:
+        console.log(`%cCommand 0x${data[0].toString(16)} oh oh!`, 'color: red');
+        break;
+    }
+    // process the WCC
+    if (retVal.wcc && retVal.wcc.resetMDT)
+      actions.push(new ResetMDT());
+    if (retVal.wcc && retVal.wcc.unlockKeyboard)
+      actions.push(new KeyboardLocked(false));
+  }
+
   private writeOrdersAndData(data: Uint8Array,
                              fill = false): { wcc: WCC, cells: Cell[] } {
     // these are the individual cells on the screen
@@ -230,8 +256,7 @@ export class LU3270Service {
     this.address = 0;
     // NOTE: the command is at [0] and the WCC at [1]
     const wcc = WCC.fromByte(data[1]);
-    // NOTE: LT marks end of stream, but 1st byte of LT is unambiguous
-    while ((this.offset < data.length) && (data[this.offset] !== LT[0])) {
+    while (this.offset < data.length) {
       const order = data[this.offset++];
       switch (order) {
         case Order.SF:

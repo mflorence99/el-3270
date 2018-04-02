@@ -1,5 +1,5 @@
 import { AID, AIDLookup } from '../../services/data-stream';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
 import { CursorAt, ErrorMessage, KeyboardLocked } from '../../state/status';
 
@@ -37,7 +37,8 @@ export class ScreenComponent extends LifecycleComponent
   private setup: Function;
 
   /** ctor */
-  constructor(private element: ElementRef,
+  constructor(private application: ApplicationRef,
+              private element: ElementRef,
               private lu3270: LU3270Service,
               private store: Store) {
     super();
@@ -61,16 +62,18 @@ export class ScreenComponent extends LifecycleComponent
 
   /** Position the cursor based on a mouse click */
   cursorAt(cellID: string): void {
-    if (cellID && cellID.startsWith('cell'))
+    if (cellID && cellID.startsWith('cell')) {
       this.store.dispatch(new CursorAt(parseInt(cellID.substring(4), 10)));
+      this.application.tick();
+    }
   }
 
   /** Handle keystrokes */
   keystroke(event: KeyboardEvent): void {
-    console.log(event);
     if (event.code.startsWith('Arrow')) {
       const cursorOp: any = event.code.substring(5).toLowerCase();
-      this.lu3270.cursorTo(this.status.cursorAt, cursorOp, this.prefs.numCols, this.prefs.numRows);
+      const cursorTo = this.lu3270.cursorTo(this.status.cursorAt, cursorOp, this.prefs.numCols, this.prefs.numRows);
+      this.store.dispatch(new CursorAt(cursorTo));
     }
     else if (event.code === 'Backspace') {
       const cursorAt = this.status.cursorAt;
@@ -89,6 +92,7 @@ export class ScreenComponent extends LifecycleComponent
       const value = event.key;
       this.store.dispatch(new UpdateCellValue({ cursorAt, value }));
     }
+    this.application.tick();
   }
 
   // listeners

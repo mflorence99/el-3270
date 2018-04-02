@@ -3,10 +3,10 @@ import { ApplicationRef, Injectable } from '@angular/core';
 import { Connected, CursorAt, ErrorMessage, KeyboardLocked, Waiting } from '../state/status';
 import { EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
 import { a2e, e2a } from 'ellib/lib/utils/convert';
+import { dump, toHex } from 'ellib/lib/utils';
 
 import { ElectronService } from 'ngx-electron';
 import { Store } from '@ngxs/store';
-import { dump } from 'ellib/lib/utils';
 
 /**
  * Encapsulates 3270 device handling
@@ -26,6 +26,8 @@ import { dump } from 'ellib/lib/utils';
 export class LU3270Service {
 
   private address: number;
+  private attributes: Attributes;
+  private cursorAt: number;
   private offset: number;
 
   private fieldID = 0;
@@ -62,16 +64,14 @@ export class LU3270Service {
 
   /** Reposition cursor, relative to its current position */
   cursorTo(cursorAt: number,
-           cursorOp: 'down' | 'left' | 'right' | 'up',
-           numCols: number,
-           numRows: number): number {
-    const max = numCols * numRows;
+           cursorOp: 'down' | 'left' | 'right' | 'up'): number {
+    const max = this.numCols * this.numRows;
     let cursorTo;
     switch (cursorOp) {
       case 'down':
-        cursorTo = cursorAt + numCols;
+        cursorTo = cursorAt + this.numCols;
         if (cursorTo >= max)
-          cursorTo = cursorAt % numCols;
+          cursorTo = cursorAt % this.numCols;
         break;
       case 'left':
         cursorTo = cursorAt - 1;
@@ -84,9 +84,9 @@ export class LU3270Service {
           cursorTo = 0;
         break;
       case 'up':
-        cursorTo = cursorAt - numCols;
+        cursorTo = cursorAt - this.numCols;
         if (cursorTo < 0)
-          cursorTo = (cursorAt % numCols) + max - numCols;
+          cursorTo = (cursorAt % this.numCols) + max - this.numCols;
         break;
     }
     return cursorTo;
@@ -164,23 +164,6 @@ export class LU3270Service {
     return cells;
   }
 
-  private makeField(data: Uint8Array,
-                    cells: Cell[],
-                    attributes: Attributes): void {
-    const id = `id${++this.fieldID}`;
-    while (true) {
-      if (data[this.offset] === Order.IC) {
-        this.store.dispatch(new CursorAt(this.address));
-        this.offset += 1;
-      }
-      else if (data[this.offset] >= 0x40) {
-        const value = e2a([data[this.offset++]]);
-        cells[this.address++] = new Cell(value, attributes, id);
-      }
-      else break;
-    }
-  }
-
   private readModified(cells: Cell[]): number[] {
     const modifiedByID: {[s: string]: { at: number, value: string }} = {};
     // group all the modified cells to form fields
@@ -217,7 +200,8 @@ export class LU3270Service {
   private writeCommands(data: Uint8Array,
                         actions: any[]): void {
     let retVal: { wcc?: WCC, cells?: Cell[] } = {};
-    switch (data[0]) {
+    const command = data[0];
+    switch (command) {
       case Command.EAU:
         retVal = this.writeOrdersAndData(data);
         actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
@@ -233,13 +217,17 @@ export class LU3270Service {
         break;
       case Command.WSF:
         this.writeStructuredFields(data);
+        // TODO: qcodes
         break;
       case Command.RB:
       case Command.RM:
       case Command.RMA:
-        console.log(`%cCommand 0x${data[0].toString(16)} oh oh!`, 'color: red');
+        console.log(`%cCommand 0x${toHex(command, 2)} oh oh!`, 'color: red');
         break;
     }
+    // process any cursor position
+    if (this.cursorAt >= 0)
+      actions.push(new CursorAt(this.cursorAt));
     // process the WCC
     if (retVal.wcc && retVal.wcc.resetMDT)
       actions.push(new ResetMDT());
@@ -252,20 +240,27 @@ export class LU3270Service {
     // these are the individual cells on the screen
     // we fill with dummy protrcted fields on erase
     const cells = this.initCells(fill);
-    this.offset = 2;
     this.address = 0;
+    this.attributes = new Attributes(true);
+    this.cursorAt = -1;
     // NOTE: the command is at [0] and the WCC at [1]
+    this.offset = 2;
     const wcc = WCC.fromByte(data[1]);
     while (this.offset < data.length) {
       const order = data[this.offset++];
       switch (order) {
         case Order.SF:
-          const attributes = Attributes.fromByte(data[this.offset++]);
+          this.attributes = Attributes.fromByte(data[this.offset++]);
           this.address += 1; // NOTE: attributes take up space!
-          this.makeField(data, cells, attributes);
+          this.fieldID += 1;
           break;
         case Order.SFE:
-          console.log('%cSFE oh oh!', 'color: red');
+          const count = data[this.offset++] * 2;
+          const bytes = data.slice(this.offset, this.offset + count);
+          this.attributes = Attributes.fromBytes(bytes);
+          this.address += 1; // NOTE: attributes take up space!
+          this.fieldID += 1;
+          this.offset += count;
           break;
         case Order.SBA:
           this.address = addressFromBytes([data[this.offset++], data[this.offset++]]);
@@ -277,30 +272,42 @@ export class LU3270Service {
           console.log('%cMF oh oh!', 'color: red');
           break;
         case Order.IC:
-          this.store.dispatch(new CursorAt(this.address));
+          this.cursorAt = this.address;
           break;
         case Order.PT:
           console.log('%cPT oh oh!', 'color: red');
           break;
         case Order.RA:
-          console.log('%cRA oh oh!', 'color: red');
+          const repeatTo = addressFromBytes([data[this.offset++], data[this.offset++]]);
+          const byte = data[this.offset++];
+          const value = (byte === 0x00)? null : e2a([byte]);
+          const max = this.numCols * this.numRows;
+          while (true) {
+            const id = `id${this.fieldID}`;
+            cells[this.address++] = new Cell(value, this.attributes, id);
+            if (this.address === repeatTo)
+              break;
+            if (this.address === max)
+              this.address = 0;
+          }
           break;
         case Order.EUA:
           console.log('%cEUA oh oh!', 'color: red');
           break;
         default:
           // if it isn't an order, then treat it as data
-          if (order >= 0x40) {
-            const value = e2a([order]);
-            cells[this.address++] = new Cell(value, new Attributes(true));
+          if ((order === 0x00) || (order >= 0x40)) {
+            const value = (order === 0x00)? null : e2a([order]);
+            const id = `id${this.fieldID}`;
+            cells[this.address++] = new Cell(value, this.attributes, id);
           }
-          else console.log(`%cOrder 0x${order.toString(16)} oh oh!`, 'color: red');
+          else console.log(`%cOrder 0x${toHex(order, 2)} oh oh!`, 'color: red');
       }
     }
     return { wcc, cells };
   }
 
-  // NOTE: structured fields in ths context are graphics, synbols etc
+  // NOTE: structured fields in ths context are graphics, symbols etc
   // we currently completely ignore them
   private writeStructuredFields(data: Uint8Array): void { }
 

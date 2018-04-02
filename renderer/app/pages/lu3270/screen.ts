@@ -72,7 +72,7 @@ export class ScreenComponent extends LifecycleComponent
   keystroke(event: KeyboardEvent): void {
     if (event.code.startsWith('Arrow')) {
       const cursorOp: any = event.code.substring(5).toLowerCase();
-      const cursorTo = this.lu3270.cursorTo(this.status.cursorAt, cursorOp, this.prefs.numCols, this.prefs.numRows);
+      const cursorTo = this.lu3270.cursorTo(this.status.cursorAt, cursorOp);
       this.store.dispatch(new CursorAt(cursorTo));
     }
     else if (event.code === 'Backspace') {

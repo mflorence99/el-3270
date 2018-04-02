@@ -30,7 +30,8 @@ export class LU3270Service {
   private cursorAt: number;
   private offset: number;
 
-  private fieldID = 0;
+  private fieldID: string = null;
+  private uniqueID = 0;
 
   private isConnected: boolean;
 
@@ -156,10 +157,11 @@ export class LU3270Service {
   }
 
   private initCells(fill: boolean): Cell[] {
-    const cells = new Array(this.numCols * this.numRows);
+    const max = this.numCols * this.numRows;
+    const cells = new Array(max);
     if (fill) {
-      const filler = new Cell(null, new Attributes(true));
-      cells.fill(filler);
+      for (let ix = 0; ix < max; ix++)
+        cells[ix] = new Cell(null, new Attributes(true));
     }
     return cells;
   }
@@ -240,9 +242,11 @@ export class LU3270Service {
     // these are the individual cells on the screen
     // we fill with dummy protrcted fields on erase
     const cells = this.initCells(fill);
+    // setup decode indexes
     this.address = 0;
     this.attributes = new Attributes(true);
     this.cursorAt = -1;
+    this.fieldID = null;
     // NOTE: the command is at [0] and the WCC at [1]
     this.offset = 2;
     const wcc = WCC.fromByte(data[1]);
@@ -252,18 +256,25 @@ export class LU3270Service {
         case Order.SF:
           this.attributes = Attributes.fromByte(data[this.offset++]);
           this.address += 1; // NOTE: attributes take up space!
-          this.fieldID += 1;
+          this.fieldID = `id${this.uniqueID++}`;
           break;
         case Order.SFE:
           const count = data[this.offset++] * 2;
           const bytes = data.slice(this.offset, this.offset + count);
           this.attributes = Attributes.fromBytes(bytes);
           this.address += 1; // NOTE: attributes take up space!
-          this.fieldID += 1;
+          this.fieldID = `id${this.uniqueID++}`;
           this.offset += count;
           break;
         case Order.SBA:
-          this.address = addressFromBytes([data[this.offset++], data[this.offset++]]);
+          const fillTo = addressFromBytes([data[this.offset++], data[this.offset++]]);
+          while (true) {
+            cells[this.address++] = new Cell(null, this.attributes, this.fieldID);
+            if (this.address === fillTo)
+              break;
+            if (this.address >= (this.numCols * this.numRows))
+              this.address = 0;
+          }
           break;
         case Order.SA:
           console.log('%cSA oh oh!', 'color: red');
@@ -273,6 +284,11 @@ export class LU3270Service {
           break;
         case Order.IC:
           this.cursorAt = this.address;
+          if (!this.fieldID) {
+            // NOTE: IC starts an unprotected field if one hasn't been started yet
+            this.attributes = new Attributes();
+            this.fieldID = `id${this.uniqueID++}`;
+          }
           break;
         case Order.PT:
           console.log('%cPT oh oh!', 'color: red');
@@ -281,13 +297,11 @@ export class LU3270Service {
           const repeatTo = addressFromBytes([data[this.offset++], data[this.offset++]]);
           const byte = data[this.offset++];
           const value = (byte === 0x00)? null : e2a([byte]);
-          const max = this.numCols * this.numRows;
           while (true) {
-            const id = `id${this.fieldID}`;
-            cells[this.address++] = new Cell(value, this.attributes, id);
+            cells[this.address++] = new Cell(value, this.attributes, this.fieldID);
             if (this.address === repeatTo)
               break;
-            if (this.address === max)
+            if (this.address >= (this.numCols * this.numRows))
               this.address = 0;
           }
           break;
@@ -298,8 +312,7 @@ export class LU3270Service {
           // if it isn't an order, then treat it as data
           if ((order === 0x00) || (order >= 0x40)) {
             const value = (order === 0x00)? null : e2a([order]);
-            const id = `id${this.fieldID}`;
-            cells[this.address++] = new Cell(value, this.attributes, id);
+            cells[this.address++] = new Cell(value, this.attributes, this.fieldID);
           }
           else console.log(`%cOrder 0x${toHex(order, 2)} oh oh!`, 'color: red');
       }

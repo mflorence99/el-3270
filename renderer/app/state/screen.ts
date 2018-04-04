@@ -1,7 +1,7 @@
 import { Action, State, StateContext, Store } from '@ngxs/store';
 import { CursorAt, ErrorMessage, KeyboardLocked } from './status';
 
-import { Cell } from '../services/data-stream';
+import { Cell } from '../services/cell';
 
 /** NOTE: actions must come first because of AST */
 

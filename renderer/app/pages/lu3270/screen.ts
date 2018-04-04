@@ -1,8 +1,9 @@
-import { AID, AIDLookup } from '../../services/data-stream';
 import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
 import { CursorAt, ErrorMessage, KeyboardLocked } from '../../state/status';
 
+import { AID } from '../../services/types';
+import { AIDLookup } from '../../services/constants';
 import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
 import { LifecycleComponent } from 'ellib/lib/components/lifecycle';

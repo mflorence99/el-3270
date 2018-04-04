@@ -1,5 +1,7 @@
 import { Color, Highlight, TypeCode } from './types';
 
+import { Cell } from './cell';
+
 /**
  * Model 3270 field attributes
  */
@@ -21,7 +23,7 @@ export class Attributes {
     let blink = false;
     let reverse = false;
     let underscore = false;
-    let color = Color.DEFAULT;
+    let color = Color.NEUTRAL;
     for (let i = 0; i < bytes.length; i++) {
       switch (bytes[i]) {
         case TypeCode.BASIC:
@@ -56,10 +58,10 @@ export class Attributes {
                           color);
   }
 
-  /** Create from another */
-  static from(another: any): Attributes {
+  /** Create from others */
+  static from(...another: any[]): Attributes {
     const attributes = new Attributes();
-    Object.assign(attributes, another);
+    Object.assign(attributes, ...another);
     return attributes;
   }
 
@@ -72,7 +74,7 @@ export class Attributes {
               public blink = false,
               public reverse = false,
               public underscore = false,
-              public color = Color.DEFAULT) { }
+              public color = Color.NEUTRAL) { }
 
   /** Convert to CSS */
   modify(typeCode: number,
@@ -97,55 +99,70 @@ export class Attributes {
   }
 
   /** Convert to CSS */
-  toCSS(cursor: boolean): any {
+  toCSS(cell: Cell,
+        cursorAt: boolean,
+        focused: boolean): {} {
     const style: any = { };
-    if (cursor)
+    if (cursorAt) {
+      if (this.hidden) {
+        style.backgroundColor = 'var(--lu3270-color)';
+        style.color = 'var(--lu3270-color)';
+      }
+      else if (focused) {
+        style.backgroundColor = 'var(--lu3270-color)';
+        style.color = 'var(--background-color)';
+      }
       style.outline = '1px solid var(--lu3270-color)';
-    if (this.highlight)
-      style.fontWeight = '900';
-    if (this.hidden)
-      style.visibility = 'hidden';
-    if (this.blink)
-      style.animation = 'blink 1s linear infinite';
-    if (this.underscore)
-      style.textDecoration = 'underline';
-    switch (this.color) {
-      case Color.BLUE:
-        style.color = style.highlight? 'var(--mat-blue-400)' : 'var(--mat-blue-300)';
-        break;
-      case Color.RED:
-        // NOTE: subjective compensation for relative low-intensity
-        style.color = style.highlight? 'var(--mat-red-500)' : 'var(--mat-red-400)';
-        break;
-      case Color.PINK:
-        style.color = style.highlight? 'var(--mat-pink-400)' : 'var(--mat-pink-300)';
-        break;
-      case Color.GREEN:
-        style.color = style.highlight? 'var(--mat-green-400)' : 'var(--mat-green-300)';
-        break;
-      case Color.TURQUOISE:
-        style.color = style.highlight? 'var(--mat-cyan-400)' : 'var(--mat-cyan-300)';
-        break;
-      case Color.YELLOW:
-        style.color = style.highlight? 'var(--mat-yellow-400)' : 'var(--mat-yellow-300)';
-        break;
-      case Color.WHITE:
-        style.color = style.highlight? 'white' : 'var(--mat-grey-100)';
-        break;
-      default:
-        if (style.highlight)
-          style.color = 'var(--lu3270-highlight-color)';
     }
-    if (this.reverse) {
-      style.backgroundColor = style.color? style.color : 'var(--lu3270-color)';
-      style.color = (this.color === Color.WHITE)? 'var(--mat-grey-900)' : 'white';
+    else if (this.hidden) {
+      style.backgroundColor = 'var(--background-color)';
+      style.color = 'var(--background-color)';
+    }
+    else if (!cell.attribute) {
+      if (this.highlight)
+        style.fontWeight = '900';
+      if (this.blink)
+        style.animation = 'blink 1s linear infinite';
+      if (this.underscore)
+        style.textDecoration = 'underline';
+      switch (this.color) {
+        case Color.BLUE:
+          style.color = style.highlight? 'var(--mat-blue-400)' : 'var(--mat-blue-300)';
+          break;
+        case Color.RED:
+          // NOTE: subjective compensation for relative low-intensity
+          style.color = style.highlight? 'var(--mat-red-500)' : 'var(--mat-red-400)';
+          break;
+        case Color.PINK:
+          style.color = style.highlight? 'var(--mat-pink-400)' : 'var(--mat-pink-300)';
+          break;
+        case Color.GREEN:
+          style.color = style.highlight? 'var(--mat-green-400)' : 'var(--mat-green-300)';
+          break;
+        case Color.TURQUOISE:
+          style.color = style.highlight? 'var(--mat-cyan-400)' : 'var(--mat-cyan-300)';
+          break;
+        case Color.YELLOW:
+          style.color = style.highlight? 'var(--mat-yellow-400)' : 'var(--mat-yellow-300)';
+          break;
+        case Color.WHITE:
+          style.color = style.highlight? 'white' : 'var(--mat-grey-100)';
+          break;
+        default:
+          if (style.highlight)
+            style.color = 'var(--lu3270-highlight-color)';
+      }
+      if (cell.value && this.reverse) {
+        style.backgroundColor = style.color? style.color : 'var(--lu3270-color)';
+        style.color = 'var(--mat-grey-900)';
+      }
     }
     return style;
   }
 
   /** String dump, for testing */
   toString() {
-    return `ATTR=[${this.protect? 'PROT ' : ''}${this.numeric? 'NUM ' : ''}${this.highlight? 'HILITE ' : ''}${this.hidden? 'HIDDEN ' : ''}${this.modified? 'MDT ' : ''}${this.blink? 'BLINK ' : ''}${this.reverse? 'REV ' : ''}${this.underscore? 'USCORE ' : ''}${this.color? Color[this.color] : ''}]`;
+    return `ATTR=[${this.protect? 'PROT ' : ''}${this.numeric? 'NUM ' : ''}${this.highlight? 'HILITE ' : ''}${this.hidden? 'HIDDEN ' : ''}${this.modified? 'MDT ' : ''}${this.blink? 'BLINK ' : ''}${this.reverse? 'REV ' : ''}${this.underscore? 'USCORE ' : ''}${Color[this.color]}]`;
   }
 
 }

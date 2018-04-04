@@ -16,10 +16,16 @@ app.on('ready', () => {
   theWindow.loadURL('http://localhost:4200');
   // theWindow.setMenu(null);
   theWindow.webContents.openDevTools();
+  theWindow.on('blur', () => {
+    theWindow.webContents.send('focused', false);
+  });
   theWindow.on('close', () => {
     if (theConnection)
       theConnection.unsubscribe();
     theConnection = null;
+  });
+  theWindow.on('focus', () => {
+    theWindow.webContents.send('focused', true);
   });
 });
 

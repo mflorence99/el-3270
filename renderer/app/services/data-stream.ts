@@ -6,6 +6,10 @@ export class InputDataStream {
 
   private offset = 0;
 
+  static from(another: InputDataStream): InputDataStream {
+    return new InputDataStream(another.data);
+  }
+
   /** ctor */
   constructor(public data: Uint8Array) { }
 
@@ -16,7 +20,7 @@ export class InputDataStream {
 
   /** Any more bytes in stream? */
   hasNext(): boolean {
-    return this.offset <= this.data.length;
+    return this.offset < this.data.length;
   }
 
   /** Consume the next byte */

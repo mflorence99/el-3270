@@ -1,6 +1,7 @@
 import { Action, State, StateContext, Store } from '@ngxs/store';
 import { CursorAt, ErrorMessage, KeyboardLocked } from './status';
 
+import { Attributes } from '../services/attributes';
 import { Cell } from '../services/cell';
 
 /** NOTE: actions must come first because of AST */
@@ -47,10 +48,8 @@ export interface ScreenStateModel {
                  { payload }: ClearCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload - 1];
-    if (cell.attributes.protect) {
-      this.store.dispatch(new ErrorMessage('PROT'));
-      this.store.dispatch(new KeyboardLocked(true));
-    }
+    if (cell.attribute || cell.attributes.protect)
+      this.store.dispatch([new ErrorMessage('PROT'), new KeyboardLocked(true)]);
     else {
       cell.attributes.modified = false;
       cell.value = null;
@@ -64,7 +63,7 @@ export interface ScreenStateModel {
                          { payload }: EraseUnprotectedScreen) {
     const erased = { ...getState() };
     erased.cells
-      .filter(cell => cell && !cell.attributes.protect)
+      .filter(cell => cell && !(cell.attribute || cell.attributes.protect))
       .forEach(cell =>  {
         cell.attributes.modified = false;
         cell.value = null;
@@ -75,7 +74,12 @@ export interface ScreenStateModel {
   @Action(ReplaceScreen)
   replaceScreen({ getState, setState }: StateContext<ScreenStateModel>,
                { payload }: ReplaceScreen) {
-    setState({...getState(), ...payload});
+    const replaced = { ...getState() };
+    payload.cells.forEach((cell, ix) => {
+      replaced.cells[ix] = cell;
+    });
+    this.propagateUnprotected(replaced.cells);
+    setState({...replaced});
   }
 
   @Action(ResetMDT)
@@ -93,10 +97,10 @@ export interface ScreenStateModel {
                   { payload }: UpdateCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload.cursorAt];
-    if (cell.attributes.protect) {
-      this.store.dispatch(new ErrorMessage('PROT'));
-      this.store.dispatch(new KeyboardLocked(true));
-    }
+    if (cell.attribute || cell.attributes.protect)
+      this.store.dispatch([new ErrorMessage('PROT'), new KeyboardLocked(true)]);
+    else if (cell.attributes.numeric && !payload.value.match(/[0-9],\.-/g))
+      this.store.dispatch([new ErrorMessage('NUM'), new KeyboardLocked(true)]);
     else {
       cell.attributes.modified = true;
       cell.value = payload.value;
@@ -110,9 +114,23 @@ export interface ScreenStateModel {
                { payload }: UpdateScreen) {
     const updated = { ...getState() };
     payload.cells.forEach((cell, ix) => {
-      updated.cells[ix] = cell;
+      if (cell)
+        updated.cells[ix] = cell;
     });
+    this.propagateUnprotected(updated.cells);
     setState({...updated});
+  }
+
+  // private methods
+
+  private propagateUnprotected(cells: Cell[]): void {
+    let attributes: Attributes = null;
+    cells.forEach(cell => {
+      if (cell.attribute)
+        attributes = cell.attributes.protect? null : cell.attributes;
+      else if (!cell.value && attributes)
+        cell.attributes = Attributes.from(attributes);
+    });
   }
 
 }

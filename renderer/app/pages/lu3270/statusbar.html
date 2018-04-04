@@ -29,7 +29,7 @@
 </div>
 
 <div
-  [ngStyle]="{visibility: (status.connected && screen.cells[status.cursorAt]?.attributes.protect)? 'visible' : 'hidden'}">
+  [ngStyle]="{visibility: (status.connected && (screen.cells[status.cursorAt]?.attribute || screen.cells[status.cursorAt]?.attributes.protect))? 'visible' : 'hidden'}">
   PROT
 </div>
 

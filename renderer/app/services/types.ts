@@ -36,7 +36,7 @@ export enum AID {
 }
 
 export enum Color {
-  DEFAULT   = 0x00,
+  NEUTRAL   = 0x00,
   BLUE      = 0xF1,
   RED       = 0xF2,
   PINK      = 0xF3,

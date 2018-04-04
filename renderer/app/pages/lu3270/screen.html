@@ -7,7 +7,7 @@
 
   <div
     [id]="'cell' + ix"
-    [ngStyle]="cell.attributes.toCSS(ix === status.cursorAt)"
+    [ngStyle]="cell.toCSS(status.cursorAt === ix, status.focused)"
     *ngFor="let cell of screen.cells; let ix = index">
     {{ cell.value? cell.value : '\u00a0' }}
   </div>

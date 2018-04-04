@@ -14,6 +14,10 @@ export class ErrorMessage {
   constructor(public readonly payload: string) {}
 }
 
+export class Focused {
+  constructor(public readonly payload: boolean) {}
+}
+
 export class KeyboardLocked {
   constructor(public readonly payload: boolean) {}
 }
@@ -26,6 +30,7 @@ export interface StatusStateModel {
   connected: boolean;
   cursorAt: number;
   error: boolean;
+  focused: boolean;
   keyboardLocked: boolean;
   message: string;
   waiting: boolean;
@@ -37,6 +42,7 @@ export interface StatusStateModel {
     connected: false,
     cursorAt: 0,
     error: false,
+    focused: false,
     keyboardLocked: false,
     message: '',
     waiting: false
@@ -51,7 +57,7 @@ export interface StatusStateModel {
 
   @Action(CursorAt)
   cursorAt({ getState, patchState }: StateContext<StatusStateModel>,
-            { payload }: CursorAt) {
+           { payload }: CursorAt) {
     patchState({cursorAt: payload});
   }
 
@@ -59,6 +65,12 @@ export interface StatusStateModel {
   errorMessage({ getState, patchState }: StateContext<StatusStateModel>,
                { payload }: ErrorMessage) {
     patchState({error: !!payload, message: payload});
+  }
+
+  @Action(Focused)
+  focused({ getState, patchState }: StateContext<StatusStateModel>,
+          { payload }: Focused) {
+    patchState({focused: payload});
   }
 
   @Action(KeyboardLocked)

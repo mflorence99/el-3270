@@ -1,7 +1,7 @@
 import { AID, Command, Order, QCode, SFID } from './types';
+import { AIDLookup, CommandLookup, LT } from './constants';
 import { ApplicationRef, Injectable } from '@angular/core';
-import { CommandLookup, LT, OrderLookup } from './constants';
-import { Connected, CursorAt, ErrorMessage, KeyboardLocked, Waiting } from '../state/status';
+import { Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
 import { EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
 import { InputDataStream, OutputDataStream } from './data-stream';
 import { a2e, e2a } from 'ellib/lib/utils/convert';
@@ -48,6 +48,7 @@ export class LU3270Service {
     this.electron.ipcRenderer.on('disconnected', this.disconnected.bind(this));
     this.electron.ipcRenderer.on('data', this.dataHandler.bind(this));
     this.electron.ipcRenderer.on('error', this.errorHandler.bind(this));
+    this.electron.ipcRenderer.on('focused', this.focusHandler.bind(this));
   }
 
   /** Connect to host */
@@ -113,6 +114,12 @@ export class LU3270Service {
 
   // private methods
 
+  private addressAsRowCol(address: number): string {
+    const row = Math.trunc(address / this.numCols) + 1;
+    const col = (address % this.numCols) + 1;
+    return `${row}/${col}`;
+  }
+
   private connected(): void {
     this.store.dispatch([new Connected(true),
     new Waiting(false),
@@ -124,7 +131,7 @@ export class LU3270Service {
                       data: Uint8Array): void {
     const actions: any[] = [];
     let slice: Uint8Array;
-    dump(data, 'Host -> 3270', true, 'blue');
+    dump(data, 'Host -> 3270', true, 'maroon');
     // NOTE: data from host may be multiple frames delimited by LT
     for (let ix = 0, iy = 0; ix < data.length; ) {
       iy = data.indexOf(LT[0], ix);
@@ -154,8 +161,15 @@ export class LU3270Service {
   private errorHandler(event: any,
                        error: string): void {
     this.store.dispatch([new Connected(false),
-    new ErrorMessage(error)]);
+                         new ErrorMessage(error)]);
     this.isConnected = false;
+    this.application.tick();
+  }
+
+  private focusHandler(event: any,
+                       focused: boolean): void {
+    this.store.dispatch(new Focused(focused));
+    this.application.tick();
   }
 
   private initCells(fill: boolean): Cell[] {
@@ -166,6 +180,104 @@ export class LU3270Service {
         cells[ix] = new Cell(null, new Attributes());
     }
     return cells;
+  }
+
+  private logInboundOrders(istream: InputDataStream): void {
+    const aid: AID = istream.next();
+    const cursorAt = addressFromBytes([istream.next(), istream.next()]);
+    console.groupCollapsed(`%c3270 -> Host Command ${AIDLookup[aid]} Cursor ${this.addressAsRowCol(cursorAt)} [${cursorAt}]`, 'color: olive');
+    let address, chars = [];
+    while (istream.hasNext()) {
+      const order = istream.next();
+      // log actual data
+      if ((order !== 0x00) && (order < 0x40)) {
+        if (chars.length)
+          console.log(`%c===> %c${chars.join('')}`, 'color: gray', 'color: olive');
+        chars = [];
+      }
+      // log order
+      switch (order) {
+        case Order.SF:
+          console.log(`%cSF`, 'color: black');
+          break;
+        case Order.SBA:
+          address = addressFromBytes([istream.next(), istream.next()]);
+          console.log(`%cSBA %c${this.addressAsRowCol(address)} [${address}]`, 'color: black', 'color: gray');
+          break;
+        default:
+          if ((order === 0x00) || (order >= 0x40))
+            chars.push((order === 0x00)? '\u2022' : e2a([order]));
+      }
+    }
+    // any remaining chars
+    if (chars.length)
+      console.log(`%c===> %c${chars.join('')}`, 'color: gray', 'color: olive');
+    console.groupEnd();
+  }
+
+  private logOutboundOrders(istream: InputDataStream): void {
+    const command: Command = istream.next();
+    const wcc = WCC.fromByte(istream.next());
+    console.groupCollapsed(`%cHost -> 3270 Command ${CommandLookup[command]} ${wcc.toString()}`, 'color: brown');
+    let address, attributes, count, value, chars = [];
+    while (istream.hasNext()) {
+      const order = istream.next();
+      // log actual data
+      if ((order !== 0x00) && (order < 0x40)) {
+        if (chars.length)
+          console.log(`%c===> %c${chars.join('')}`, 'color: gray', 'color: brown');
+        chars = [];
+      }
+      // log order
+      switch (order) {
+        case Order.SF:
+          attributes = Attributes.fromByte(istream.next());
+          console.log(`%cSF %c${attributes.toString()}`, 'color: black', 'color: gray');
+          break;
+        case Order.SFE:
+          count = istream.next() * 2;
+          attributes = Attributes.fromBytes(istream.nextBytes(count));
+          console.log(`%cSFE %c${attributes.toString()}`, 'color: black', 'color: gray');
+          break;
+        case Order.SBA:
+          address = addressFromBytes([istream.next(), istream.next()]);
+          console.log(`%cSBA %c${this.addressAsRowCol(address)} [${address}]`, 'color: black', 'color: gray');
+          break;
+        case Order.MF:
+          count = istream.next() * 2;
+          attributes = Attributes.fromBytes(istream.nextBytes(count));
+          console.log(`%cMF %c${attributes.toString()}`, 'color: black', 'color: gray');
+          break;
+        case Order.IC:
+          console.log('%cIC', 'color: black');
+          break;
+        case Order.PT:
+          console.log('%cPT', 'color: black');
+          break;
+        case Order.SA:
+          attributes = Attributes.fromBytes(istream.nextBytes(2));
+          console.log(`%cSA %c${attributes.toString()}`, 'color: black', 'color: gray');
+          break;
+        case Order.RA:
+          address = addressFromBytes([istream.next(), istream.next()]);
+          const byte = istream.next();
+          value = (byte === 0x00)? null : e2a([byte]);
+          console.log(`%cRA %c${this.addressAsRowCol(address)} ${value}`, 'color: black', 'color: gray');
+          break;
+        case Order.EUA:
+          address = addressFromBytes([istream.next(), istream.next()]);
+          console.log(`%cEUA %c${this.addressAsRowCol(address)}, 'color: black', 'color: gray'`);
+          break;
+        default:
+          if ((order === 0x00) || (order >= 0x40))
+            chars.push((order === 0x00)? '\u2022' : e2a([order]));
+          else console.log(`%cOrder ${toHex(order, 2)} unrecognized`, 'color: red');
+      }
+    }
+    // any remaining chars
+    if (chars.length)
+      console.log(`%c===> %c${chars.join('')}`, 'color: gray', 'color: brown');
+    console.groupEnd();
   }
 
   private sendQCodes(): void {
@@ -277,11 +389,13 @@ export class LU3270Service {
     // next rpq names
     // http://publibz.boulder.ibm.com/cgi-bin/bookmgr_OS390/BOOKS/
     //   CN7P4000/6.43.2?SHELF=&DT=19920626112004&CASE=
+    const rpqName: number[] = a2e('EL-3270');
     const rpqNames = [
       SFID.QUERY_REPLY,
       QCode.RPQ_NAMES,
-      // the rest from x3270 tcpdump
-      ...bytesFromDump('00 0000 0000 0000 0006 a7f3 f2f7 f0')
+      ...bytesFromDump('00 0000 0000 0000 00'),
+      rpqName.length + 1,
+      ...rpqName
     ];
     ostream.put16(rpqNames.length + 2);
     ostream.putBytes(rpqNames);
@@ -299,7 +413,7 @@ export class LU3270Service {
     // we're done!
     ostream.putBytes(LT);
     const data: Uint8Array = ostream.toArray();
-    dump(data, '3270 -> Host (qcodes)', true, 'purple');
+    dump(data, '3270 -> Host QCodes', true, 'purple');
   }
 
   private submitHandler(aid: AID,
@@ -308,36 +422,31 @@ export class LU3270Service {
     const ostream = new OutputDataStream();
     ostream.put(aid);
     ostream.putBytes(addressToBytes(cursorAt));
-    // group all the modified cells to form fields
     // adjacent unprotected fields are grouped as a field
-    const modifiedByID: {[s: string]: { at: number, value: string }} = {};
-    let fieldNum = 0;
+    let address = null;
+    let chars = [];
     cells.forEach((cell, ix) => {
-      if (cell.attributes.protect)
-        fieldNum += 1;
-      else if (cell.value && cell.attributes.modified) {
-        const fieldID = `id${fieldNum}`;
-        let modified = modifiedByID[fieldID];
-        if (!modified) {
-          modified = {at: 0, value: ''};
-          modifiedByID[fieldID] = modified;
+      if (cell.attribute || cell.attributes.protect) {
+        if (address) {
+          ostream.put(Order.SBA);
+          ostream.putBytes(addressToBytes(address));
+          ostream.putBytes(a2e(chars.join('')));
+          address = null;
+          chars = [];
         }
-        if (!modified.at)
-          modified.at = ix;
-        modified.value += cell.value;
       }
-    });
-    // now convert them to SBA/SF sequences
-    Object.keys(modifiedByID).forEach(id => {
-      const modified = modifiedByID[id];
-      ostream.put(Order.SBA);
-      ostream.putBytes(addressToBytes(modified.at));
-      ostream.put(Order.SF);
-      ostream.putBytes(a2e(modified.value));
+      else if (cell.value && cell.attributes.modified) {
+        if (address == null)
+          address = ix;
+        chars[ix - address] = cell.value;
+      }
     });
     ostream.putBytes(LT);
     const data: Uint8Array = ostream.toArray();
-    dump(data, '3270 -> Host (submit)', true, 'magenta');
+    dump(data, '3270 -> Host (submit)', true, 'green');
+    // dump the orders
+    const slice = data.slice(0, data.length - LT.length);
+    this.logInboundOrders(new InputDataStream(slice));
     return data;
   }
 
@@ -345,33 +454,32 @@ export class LU3270Service {
                         actions: any[]): void {
     let retVal: { wcc?: WCC, cells?: Cell[] } = {};
     // setup decode indexes
-    this.address = 0;
     this.attributes = new Attributes();
     this.cursorAt = null;
-    const command = istream.next();
+    const command: Command = istream.next();
     switch (command) {
       case Command.EAU:
-        retVal = this.writeOrdersAndData(command, istream);
+        retVal = this.writeOrdersAndData(istream);
         actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
         break;
       case Command.EW:
       case Command.EWA:
+        this.address = 0;
         this.cursorAt = 0;
-        retVal = this.writeOrdersAndData(command, istream, true);
+        retVal = this.writeOrdersAndData(istream, true);
         actions.push(new ReplaceScreen({ cells: retVal.cells }));
         break;
       case Command.W:
-        retVal = this.writeOrdersAndData(command, istream);
+        retVal = this.writeOrdersAndData(istream);
         actions.push(new UpdateScreen({ cells: retVal.cells }));
         break;
       case Command.WSF:
         this.writeStructuredFields(istream);
-        // TODO: qcodes
         break;
       case Command.RB:
       case Command.RM:
       case Command.RMA:
-        console.log(`%cCommand 0x${toHex(command, 2)} oh oh!`, 'color: red');
+        console.log(`%cCommand 0x${toHex(command, 2)} unrecognized`, 'color: red');
         break;
     }
     // process any cursor position
@@ -384,26 +492,24 @@ export class LU3270Service {
       actions.push(new KeyboardLocked(false));
   }
 
-  private writeOrdersAndData(command: Command,
-                             istream: InputDataStream,
+  private writeOrdersAndData(istream: InputDataStream,
                              fill = false): { wcc: WCC, cells: Cell[] } {
+    this.logOutboundOrders(InputDataStream.from(istream));
     // these are the individual cells on the screen
-    // we fill with dummy protrcted fields on erase
+    // we fill with dummy protected fields on erase
     const cells = this.initCells(fill);
     const wcc = WCC.fromByte(istream.next());
-    const log = [];
     while (istream.hasNext()) {
       const order = istream.next();
-      let unsupported = false;
       switch (order) {
         case Order.SF:
           this.attributes = Attributes.fromByte(istream.next());
-          cells[this.address++] = new Cell(null, new Attributes(true));
+          cells[this.address++] = new Cell(null, this.attributes, true);
           break;
         case Order.SFE:
           const count = istream.next() * 2;
           this.attributes = Attributes.fromBytes(istream.nextBytes(count));
-          cells[this.address++] = new Cell(null, new Attributes(true));
+          cells[this.address++] = new Cell(null, this.attributes, true);
           break;
         case Order.SBA:
           this.address = addressFromBytes([istream.next(), istream.next()]);
@@ -414,13 +520,11 @@ export class LU3270Service {
           this.attributes.modify(typeCode, attributes);
           break;
         case Order.MF:
-          unsupported = true;
           break;
         case Order.IC:
           this.cursorAt = this.address;
           break;
         case Order.PT:
-          unsupported = true;
           break;
         case Order.RA:
           const repeatTo = addressFromBytes([istream.next(), istream.next()]);
@@ -441,7 +545,6 @@ export class LU3270Service {
           this.address = repeatTo;
           break;
         case Order.EUA:
-          unsupported = true;
           break;
         default:
           // if it isn't an order, then treat it as data
@@ -449,19 +552,8 @@ export class LU3270Service {
             const value = (order === 0x00)? null : e2a([order]);
             cells[this.address++] = new Cell(value, this.attributes);
           }
-          else unsupported = true;
       }
-      // stash log data for the orders
-      const row = Math.trunc(this.address / this.numCols) + 1;
-      const col = (this.address % this.numCols) + 1;
-      const lookup = OrderLookup[order];
-      if (lookup)
-        log.push({row, col, order: lookup, hex: `0x${toHex(order, 2)}`, attributes: this.attributes.toString(), supported: unsupported? 'NO' : ''});
     }
-    // log the command and any orders
-    console.table([{command: CommandLookup[command], hex: `0x${toHex(command, 2)}`, wcc: wcc.toString()}]);
-    if (log.length)
-      console.table(log);
     return { wcc, cells };
   }
 

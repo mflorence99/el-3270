@@ -102,6 +102,11 @@ export class LU3270Service {
     this.electron.ipcRenderer.send('disconnect');
   }
 
+  /** Simulate print screen */
+  print(): void {
+    this.electron.ipcRenderer.send('print');
+  }
+
   /** Reposition cursor, relative to its current position */
   tabTo(cursorAt: number,
         cells: Cell[],

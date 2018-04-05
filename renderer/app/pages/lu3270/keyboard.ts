@@ -34,8 +34,11 @@ export class KeyboardComponent extends LifecycleComponent {
 
   /** Handle simulated key */
   aid(code: string) {
-    if (code && this.status.connected)
-      this.lu3270.submit(AID[code], this.status.cursorAt, this.screen.cells);
+    if (code && this.status.connected) {
+      if (code === 'PRINT')
+        this.lu3270.print();
+      else this.lu3270.submit(AID[code], this.status.cursorAt, this.screen.cells);
+    }
   }
 
   // bind OnChange handlers

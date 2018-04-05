@@ -128,7 +128,13 @@
     label="CLEAR">
   </el3270-key>
 
-  <div style="grid-column-start: span 8">
+  <el3270-key
+    [disabled]="!status.connected"
+    [short]="true"
+    label="PRINT">
+  </el3270-key>
+
+  <div style="grid-column-start: span 7">
 
   </div>
 

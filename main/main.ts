@@ -1,7 +1,10 @@
-import { BrowserWindow, app, ipcMain } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain } from 'electron';
 
 import { Subscription } from 'rxjs/Subscription';
 import { Tn3270 } from 'tn3270/lib/tn3270';
+
+require('electron-capture');
+const fs = require('fs');
 
 /**
  * Electron event dispatcher
@@ -12,7 +15,15 @@ let theWindow: BrowserWindow;
 let theTn3270: Tn3270;
 
 app.on('ready', () => {
-  theWindow = new BrowserWindow({width: 832, height: 1024});
+  theWindow = new BrowserWindow({
+    width: 832,
+    height: 1024,
+    resizable: true,
+    webPreferences: {
+      // preload: __dirname + '/node_modules/electron-capture/src/preload.js'
+      preload: '/home/mflo/mflorence99/el-3270/node_modules/electron-capture/src/preload.js'
+    }
+  });
   theWindow.loadURL('http://localhost:4200');
   // theWindow.setMenu(null);
   theWindow.webContents.openDevTools();
@@ -33,6 +44,22 @@ app.on('window-all-closed', () => {
   if (theConnection)
     theConnection.unsubscribe();
   app.quit();
+});
+
+ipcMain.on('print', (event: any) => {
+  dialog.showSaveDialog(theWindow, {
+    filters: [
+      {name: 'PNG Files', extensions: ['png']},
+    ],
+    title: 'Save EL-3270 Screen Image'
+  }, filename => {
+    console.log(filename);
+    if (filename) {
+      theWindow['captureFullPage']((imageStream) => {
+        imageStream.pipe(fs.createWriteStream(filename));
+      });
+    }
+  });
 });
 
 ipcMain.on('connect', (event: any,

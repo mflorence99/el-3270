@@ -71,29 +71,36 @@ export class ScreenComponent extends LifecycleComponent
 
   /** Handle keystrokes */
   keystroke(event: KeyboardEvent): void {
-    if (event.code.startsWith('Arrow')) {
-      const cursorOp: any = event.code.substring(5).toLowerCase();
-      const cursorTo = this.lu3270.cursorTo(this.status.cursorAt, cursorOp);
-      this.store.dispatch(new CursorAt(cursorTo));
+    if (this.status.connected && !this.status.keyboardLocked) {
+      if (event.code.startsWith('Arrow')) {
+        const cursorOp: any = event.code.substring(5).toLowerCase();
+        this.lu3270.cursorTo(this.status.cursorAt, cursorOp);
+      }
+      else if (event.code === 'Backspace') {
+        const cursorAt = this.status.cursorAt;
+        this.store.dispatch(new ClearCellValue(cursorAt));
+      }
+      else if (event.code === 'Enter')
+        this.lu3270.submit(AID.ENTER, this.status.cursorAt, this.screen.cells);
+      else if (event.code.match(/F[0-9]+/)) {
+        const aid = AIDLookup[`P${event.code}`];
+        this.lu3270.submit(aid, this.status.cursorAt, this.screen.cells);
+      }
+      else if (event.code === 'Tab') {
+        const tabOp = event.shiftKey? 'bwd' : 'fwd';
+        this.lu3270.tabTo(this.status.cursorAt, this.screen.cells, tabOp);
+      }
+      else if (event.key.length === 1) {
+        const cursorAt = this.status.cursorAt;
+        const value = event.key;
+        this.store.dispatch(new UpdateCellValue({ cursorAt, value }));
+      }
     }
-    else if (event.code === 'Backspace') {
-      const cursorAt = this.status.cursorAt;
-      this.store.dispatch(new ClearCellValue(cursorAt));
-    }
-    else if (event.code === 'Enter')
-      this.lu3270.submit(AID.ENTER, this.status.cursorAt, this.screen.cells);
-    else if (event.code === 'Escape')
+    // NOTE: Escape can get us out of a keyboard locked state
+    if (event.code === 'Escape')
       this.store.dispatch([new ErrorMessage(''), new KeyboardLocked(false)]);
-    else if (event.code.match(/F[0-9]+/)) {
-      const aid = AIDLookup[`P${event.code}`];
-      this.lu3270.submit(aid, this.status.cursorAt, this.screen.cells);
-    }
-    else if (event.key.length === 1) {
-      const cursorAt = this.status.cursorAt;
-      const value = event.key;
-      this.store.dispatch(new UpdateCellValue({ cursorAt, value }));
-    }
     this.application.tick();
+    event.preventDefault();
   }
 
   // listeners

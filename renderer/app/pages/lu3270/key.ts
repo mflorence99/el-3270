@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
 
 /**
  * Keyboard key component
@@ -12,6 +12,9 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 
 export class KeyComponent {
+
+  @HostBinding('class.disabled') @Input() disabled: boolean;
+  @HostBinding('class.short') @Input() short: boolean;
 
   @Input() label: string;
 

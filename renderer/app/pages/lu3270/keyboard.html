@@ -1,96 +1,153 @@
-<div class="keyboard">
+<div
+  (click)="aid($event.srcElement?.id)"
+  class="keyboard">
 
-  <div class="row">
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF13">
+  </el3270-key>
 
-    <el3270-key label="PF13">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF14">
+  </el3270-key>
 
-    <el3270-key label="PF14">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF15">
+  </el3270-key>
 
-    <el3270-key label="PF15">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF16">
+  </el3270-key>
 
-    <el3270-key label="PF16">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF17">
+  </el3270-key>
 
-    <el3270-key label="PF17">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF18">
+  </el3270-key>
 
-    <el3270-key label="PF18">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF19">
+  </el3270-key>
 
-    <el3270-key label="PF19">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF20">
+  </el3270-key>
 
-    <el3270-key label="PF20">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF21">
+  </el3270-key>
 
-    <el3270-key label="PF21">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF22">
+  </el3270-key>
 
-    <el3270-key label="PF22">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF23">
+  </el3270-key>
 
-    <el3270-key label="PF23">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF24">
+  </el3270-key>
 
-    <el3270-key label="PF24">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF1">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF2">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF3">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF4">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF5">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF6">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF7">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF8">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF9">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF10">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF11">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    label="PF12">
+  </el3270-key>
+
+  <el3270-key
+    [disabled]="!status.connected"
+    [short]="true"
+    label="CLEAR">
+  </el3270-key>
+
+  <div style="grid-column-start: span 8">
 
   </div>
 
-  <div class="row">
+  <el3270-key
+    [disabled]="!status.connected"
+    [short]="true"
+    label="PA1">
+  </el3270-key>
 
-    <el3270-key label="PF1">
-    </el3270-key>
+  <el3270-key
+    [disabled]="!status.connected"
+    [short]="true"
+    label="PA2">
+  </el3270-key>
 
-    <el3270-key label="PF2">
-    </el3270-key>
-
-    <el3270-key label="PF3">
-    </el3270-key>
-
-    <el3270-key label="PF4">
-    </el3270-key>
-
-    <el3270-key label="PF5">
-    </el3270-key>
-
-    <el3270-key label="PF6">
-    </el3270-key>
-
-    <el3270-key label="PF7">
-    </el3270-key>
-
-    <el3270-key label="PF8">
-    </el3270-key>
-
-    <el3270-key label="PF9">
-    </el3270-key>
-
-    <el3270-key label="PF10">
-    </el3270-key>
-
-    <el3270-key label="PF11">
-    </el3270-key>
-
-    <el3270-key label="PF12">
-    </el3270-key>
-
-  </div>
-
-  <div class="row">
-
-    <el3270-key label="PA1">
-    </el3270-key>
-
-    <el3270-key label="PA2">
-    </el3270-key>
-
-    <el3270-key label="PA3">
-    </el3270-key>
-
-  </div>
+  <el3270-key
+    [disabled]="!status.connected"
+    [short]="true"
+    label="PA3">
+  </el3270-key>
 
 </div>

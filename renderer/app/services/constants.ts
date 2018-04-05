@@ -1,4 +1,4 @@
-import { AID, Command, Order } from './types';
+import { AID, Command, Op, Order, SFID } from './types';
 
 /**
  * Common constants
@@ -19,6 +19,14 @@ export const CommandLookup = {};
 for (const command in Command)
   CommandLookup[command] = Command[command];
 
+export const OpLookup = {};
+for (const op in Op)
+  OpLookup[op] = Op[op];
+
 export const OrderLookup = {};
 for (const order in Order)
   OrderLookup[order] = Order[order];
+
+export const SFIDLookup = {};
+for (const sfid in SFID)
+  SFIDLookup[sfid] = SFID[sfid];

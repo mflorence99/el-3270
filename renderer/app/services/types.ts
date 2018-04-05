@@ -50,9 +50,6 @@ export enum Command {
   EAU = 0x6F,
   EW  = 0xF5,
   EWA = 0x7E,
-  RB  = 0xF2,
-  RM  = 0xF6,
-  RMA = 0x6E,
   W   = 0xF1,
   WSF = 0xF3
 }
@@ -61,6 +58,15 @@ export enum Highlight {
   BLINK      = 0xF1,
   REVERSE    = 0xF2,
   UNDERSCORE = 0xF4
+}
+
+export enum Op {
+  Q       = 0x02,
+  QL      = 0x03,
+  RB      = 0xF2,
+  RM      = 0xF6,
+  RMA     = 0x6E,
+  UNKNOWN = 0xFF
 }
 
 export enum Order {

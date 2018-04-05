@@ -3,18 +3,23 @@
   [layout]="ctrl.layout$ | async"
   [prefs]="ctrl.prefs$ | async"
   [screen]="ctrl.screen$ | async"
-  [status]="ctrl.status$ | async">
+  [status]="ctrl.status$ | async"
+  tabindex="-1">
 </el3270-screen>
 
 <el3270-statusbar
   [prefs]="ctrl.prefs$ | async"
   [screen]="ctrl.screen$ | async"
   [status]="ctrl.status$ | async"
-  #statusbar>
+  #statusbar
+  tabindex="-1">
 </el3270-statusbar>
 
 <el3270-keyboard
-  [layout]="ctrl.layout$ | async">
+  [layout]="ctrl.layout$ | async"
+  [screen]="ctrl.screen$ | async"
+  [status]="ctrl.status$ | async"
+  tabindex="-1">
 </el3270-keyboard>
 
 <el3270-lu3270-ctrl

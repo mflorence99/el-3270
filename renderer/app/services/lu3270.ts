@@ -1,5 +1,5 @@
-import { AID, Command, Order, QCode, SFID } from './types';
-import { AIDLookup, CommandLookup, LT } from './constants';
+import { AID, Command, Op, Order, QCode, SFID } from './types';
+import { AIDLookup, CommandLookup, LT, OpLookup, SFIDLookup } from './constants';
 import { ApplicationRef, Injectable } from '@angular/core';
 import { Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
 import { EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
@@ -68,7 +68,7 @@ export class LU3270Service {
 
   /** Reposition cursor, relative to its current position */
   cursorTo(cursorAt: number,
-           cursorOp: 'down' | 'left' | 'right' | 'up'): number {
+           cursorOp: 'down' | 'left' | 'right' | 'up'): void {
     const max = this.numCols * this.numRows;
     let cursorTo;
     switch (cursorOp) {
@@ -93,7 +93,7 @@ export class LU3270Service {
           cursorTo = (cursorAt % this.numCols) + max - this.numCols;
         break;
     }
-    return cursorTo;
+    this.store.dispatch(new CursorAt(cursorTo));
   }
 
   /** Disconnect from host */
@@ -102,11 +102,41 @@ export class LU3270Service {
     this.electron.ipcRenderer.send('disconnect');
   }
 
+  /** Reposition cursor, relative to its current position */
+  tabTo(cursorAt: number,
+        cells: Cell[],
+        tabOp: 'bwd' | 'fwd'): void {
+    const max = this.numCols * this.numRows;
+    let dir = 1, tabTo = cursorAt;
+    // if we're going backwards, and we're at the beginning of a field
+    // we'll skip this field
+    if (tabOp === 'bwd') {
+      dir = -1;
+      if ((cursorAt > 0) && cells[cursorAt - 1].attribute)
+        tabTo -= 1;
+    }
+    // now look for the first unprotected field
+    while (true) {
+      tabTo += dir;
+      if (tabTo === cursorAt)
+        break;
+      if (tabTo < 0)
+        tabTo = max - 1;
+      if (tabTo >= max)
+        tabTo = 1;
+      const cell = cells[tabTo - 1];
+      if (cell && cell.attribute && !cell.attributes.protect)
+        break;
+    }
+    if (tabTo !== cursorAt)
+      this.store.dispatch(new CursorAt(tabTo));
+  }
+
   /** Submit screen to host */
   submit(aid: AID,
          cursorAt: number,
          cells: Cell[]): void {
-    const data = this.submitHandler(aid, cursorAt, cells);
+    const data = this.readModified(aid, cursorAt, cells);
     this.store.dispatch(new Waiting(true));
     this.electron.ipcRenderer.send('write', data);
     this.application.tick();
@@ -280,7 +310,77 @@ export class LU3270Service {
     console.groupEnd();
   }
 
-  private sendQCodes(): void {
+  private logOutboundStructuredFields(istream: InputDataStream): void {
+    const command: Command = istream.next();
+    console.groupCollapsed(`%cHost -> 3270 ${CommandLookup[command]}`, `color: #7D0552`);
+    while (istream.hasNext()) {
+      // NOTE: we observe a malformed READ_PARTITION stream
+      // TODO: not sure if it is real
+      const length = istream.next16();
+      if (!istream.hasEnough(length))
+        break;
+      const sfid: SFID = istream.next();
+      console.log(`%c${SFIDLookup[sfid]} %cLEN=${length}`, 'color: black', 'color: gray');
+      switch (sfid) {
+        case SFID.READ_PARTITION:
+          const op: Op = istream.next();
+          console.log(`%cOp %c${OpLookup[op]}`, 'color: black', 'color: gray');
+          break;
+      }
+    }
+    console.groupEnd();
+  }
+
+  private readBuffer(aid: AID,
+                     cursorAt: number,
+                     cells: Cell[]): Uint8Array {
+    return null;
+  }
+
+  private readModified(aid: AID,
+                       cursorAt: number,
+                       cells: Cell[],
+                       all = false): Uint8Array {
+    const ostream = new OutputDataStream();
+    ostream.put(aid);
+    if (all || ![AID.CLEAR, AID.PA1, AID.PA2, AID.PA3].includes(aid)) {
+      ostream.putBytes(addressToBytes(cursorAt));
+      // adjacent unprotected fields are grouped as a field
+      let address = null;
+      let chars = [];
+      cells.forEach((cell, ix) => {
+        if (cell.attribute || cell.attributes.protect) {
+          if (address) {
+            ostream.put(Order.SBA);
+            ostream.putBytes(addressToBytes(address));
+            ostream.putBytes(a2e(chars.join('')));
+            address = null;
+            chars = [];
+          }
+        }
+        else if (cell.value && cell.attributes.modified) {
+          if (address == null)
+            address = ix;
+          chars[ix - address] = cell.value;
+        }
+      });
+    }
+    ostream.putBytes(LT);
+    const data: Uint8Array = ostream.toArray();
+    dump(data, '3270 -> Host (submit)', true, 'green');
+    // dump the orders
+    const slice = data.slice(0, data.length - LT.length);
+    this.logInboundOrders(new InputDataStream(slice));
+    return data;
+  }
+
+  private readModifiedAll(aid: AID,
+                          cursorAt: number,
+                          cells: Cell[]): Uint8Array {
+    return this.readModified(aid, cursorAt, cells, true);
+  }
+
+  private readQCodes(): Uint8Array {
     // NOTE: we don't really read them, we just make them up
     // to represent the device we're simulating
     const ostream = new OutputDataStream();
@@ -414,39 +514,6 @@ export class LU3270Service {
     ostream.putBytes(LT);
     const data: Uint8Array = ostream.toArray();
     dump(data, '3270 -> Host QCodes', true, 'purple');
-  }
-
-  private submitHandler(aid: AID,
-                        cursorAt: number,
-                        cells: Cell[]): Uint8Array {
-    const ostream = new OutputDataStream();
-    ostream.put(aid);
-    ostream.putBytes(addressToBytes(cursorAt));
-    // adjacent unprotected fields are grouped as a field
-    let address = null;
-    let chars = [];
-    cells.forEach((cell, ix) => {
-      if (cell.attribute || cell.attributes.protect) {
-        if (address) {
-          ostream.put(Order.SBA);
-          ostream.putBytes(addressToBytes(address));
-          ostream.putBytes(a2e(chars.join('')));
-          address = null;
-          chars = [];
-        }
-      }
-      else if (cell.value && cell.attributes.modified) {
-        if (address == null)
-          address = ix;
-        chars[ix - address] = cell.value;
-      }
-    });
-    ostream.putBytes(LT);
-    const data: Uint8Array = ostream.toArray();
-    dump(data, '3270 -> Host (submit)', true, 'green');
-    // dump the orders
-    const slice = data.slice(0, data.length - LT.length);
-    this.logInboundOrders(new InputDataStream(slice));
     return data;
   }
 
@@ -475,12 +542,6 @@ export class LU3270Service {
         break;
       case Command.WSF:
         this.writeStructuredFields(istream);
-        break;
-      case Command.RB:
-      case Command.RM:
-      case Command.RMA:
-        console.log(`%cCommand 0x${toHex(command, 2)} unrecognized`, 'color: red');
-        break;
     }
     // process any cursor position
     if (this.cursorAt != null)
@@ -558,19 +619,42 @@ export class LU3270Service {
   }
 
   private writeStructuredFields(istream: InputDataStream): void {
+    this.logOutboundStructuredFields(InputDataStream.from(istream));
     while (istream.hasNext()) {
+      // NOTE: we observe a malformed READ_PARTITION stream
+      // TODO: not sure if it is real
       const length = istream.next16();
       if (!istream.hasEnough(length))
         break;
-      const sfid: SFID = istream.next();
       // NOTE: there are a million SFIDs and we handle only what we need
+      const sfid: SFID = istream.next();
+      let data: Uint8Array = null;
       switch (sfid) {
         case SFID.READ_PARTITION:
-          this.sendQCodes();
-          break;
-        default:
+          const op: Op = istream.next();
+          switch (op) {
+            case Op.RB:
+              data = this.readBuffer(AID.DEFAULT, null, null);
+              break;
+            case Op.RM:
+              data = this.readModified(AID.DEFAULT, null, null);
+              break;
+            case Op.RMA:
+              data = this.readModifiedAll(AID.DEFAULT, null, null);
+              break;
+            // this is the case we don't understand: f3 0005 01ff ff 02
+            // it looks like one extra 0xff before the Q op code of 0x012
+            case Op.Q:
+            case Op.QL:
+            default:
+              data = this.readQCodes();
+              break;
+          }
           break;
       }
+      // write gathered data back to host
+      if (data)
+        this.electron.ipcRenderer.send('write', data);
     }
   }
 

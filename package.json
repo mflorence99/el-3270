@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "serve": "ng serve",
-    "build": "ng build --prod",
+    "build": "ng build --prod --aot",
     "electron": "tsc -p tsconfig.main.json && electron .",
     "tsc": "tsc"
   },

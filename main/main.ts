@@ -20,10 +20,11 @@ app.on('ready', () => {
     height: 1024,
     resizable: true,
     webPreferences: {
-      // preload: __dirname + '/node_modules/electron-capture/src/preload.js'
-      preload: '/home/mflo/mflorence99/el-3270/node_modules/electron-capture/src/preload.js'
+      // TODO: very temporary -- we remove /dist
+      preload: __dirname.substring(0, __dirname.length - 5) + '/node_modules/electron-capture/src/preload.js'
     }
   });
+  // TODO: also temporary -- not deploying from dist to get hot reload
   theWindow.loadURL('http://localhost:4200');
   // theWindow.setMenu(null);
   theWindow.webContents.openDevTools();
@@ -53,7 +54,6 @@ ipcMain.on('print', (event: any) => {
     ],
     title: 'Save EL-3270 Screen Image'
   }, filename => {
-    console.log(filename);
     if (filename) {
       theWindow['captureFullPage']((imageStream) => {
         imageStream.pipe(fs.createWriteStream(filename));

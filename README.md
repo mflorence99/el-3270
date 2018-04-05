@@ -63,7 +63,6 @@ One time only, you'll need to grab the code:
 ```
 git clone https://github.com/mflorence99/el-3270.git
 npm install
-
 ```
 
 Next, in another terminal session start the dev server for the Angular client. This way, hot reload of the client is supported.
@@ -77,3 +76,35 @@ Finally, in yet another session, start the Electron app itself:
 ```
 npm run electron
 ```
+
+## UI Tour
+
+Self-explanatory meta functions are triggered by the icons on the top row: connect, disconnect, show extended keyboard (more below), configuration and help.
+
+> The Help page is in a pitiful state at the moment, just a placeholder.
+
+As you change the size of the window, the 3270 font scales to best fit the available space.
+
+### Initial Configuration
+
+![Configuration](prefs.png)
+
+### Sample Screen
+
+![Sample](sample.png)
+
+### Extended Keyboard
+
+For 3270 functionality not available on modern keyboards.
+
+> I made no attempt to differentiate between ENTER and RETURN, which the real 3270 does. It is just too natural now for them to mean the same thing.
+
+![Keyboard](keyboard.png)
+
+## Debugging Information
+
+Because the whole purpose of EL-3270 is to further the understanding of the old devices, the V8 console contains copious debugging information, much of which is dedicated to dumping and decoding the 3270 data stream.
+
+![Debug](debug1.png)
+
+![Debug](debug2.png)

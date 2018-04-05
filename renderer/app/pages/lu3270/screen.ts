@@ -71,7 +71,10 @@ export class ScreenComponent extends LifecycleComponent
 
   /** Handle keystrokes */
   keystroke(event: KeyboardEvent): void {
-    if (this.status.connected && !this.status.keyboardLocked) {
+    // NOTE: an ad-hoc shortcut for print
+    if ((event.code === 'Enter') && event.ctrlKey)
+      this.lu3270.print();
+    else if (this.status.connected && !this.status.keyboardLocked) {
       if (event.code.startsWith('Arrow')) {
         const cursorOp: any = event.code.substring(5).toLowerCase();
         this.lu3270.cursorTo(this.status.cursorAt, cursorOp);

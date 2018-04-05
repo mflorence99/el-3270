@@ -1,8 +1,8 @@
 # EL-3270
 
-EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulator for the modern age. Why in earth is one needed, almost 50 years after the devices were first introduced in 1971? Of course, there is no need at all, I just did this for fun, as a voyage through computer archeology. I don't expect anyone will ever use it as an actual emulator but I hope it showcases some programming techniques of current interest and illustrates how these historically important devices worked.
+EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulator for the modern age. Why in earth is one needed, almost 50 years after the devices were first introduced in 1971? Of course, there is no need at all, I just did this for fun, as a voyage through computer archaeology. I don't expect anyone will ever use it as an actual emulator but I hope it showcases some programming techniques of current interest and illustrates how these historically important devices worked.
 
-> EL-3270 is substantially complete, only missing support for the `MF`, `PT` and `EUA` orders and the Read Buffer command. it is in minor flux until then.
+> EL-3270 is substantially complete, only missing support for the `MF`, `PT` and `EUA` orders and the Read Buffer command. It is in minor flux until then.
 
 ## Technology Stack
 
@@ -14,7 +14,7 @@ I wanted -- and certainly failed -- to present a wrapper interface and underlyin
 * [Angular Material](https://material.angular.io/) for UI components.
 * [Font Awesome](https://fontawesome.com)'s awesome library of icons.
 * The amazing [ngxs](https://ngxs.gitbooks.io/ngxs/) state management pattern.
-* Geoff Zhu's [electron-capture]https://github.com/GeoffZhu/electron-capture) to simulate the 3270's print screen functionality.
+* Geoff Zhu's [electron-capture](https://github.com/GeoffZhu/electron-capture) to simulate the 3270's print screen functionality.
 
 In addition, I factored out some interesting code for use in other projects of mine:
 
@@ -25,7 +25,7 @@ In addition, I factored out some interesting code for use in other projects of m
 
 Finally, I need to call out Jürgen Winkelmann's [labor of love](http://wotho.ethz.ch/tk4-/), the project that got me interested in EL-3270 from the start. TK4 simulates a full implementation of MVS running on an IBM 370/165, a top-of-the-line configuration in the 70s. The 370/165 sported a gigantic 16MB of memory -- you read that right, 16MB not 16GB -- yet it barely registers on `top` on my MacBook Pro.
 
-> I highly recommend the [moshix](https://www.youtube.com/channel/UCR1ajTWGiUtiAv8X-hpBY7w) YouTube channel for many in-depth discussions on mainframe archeology.
+> I highly recommend the [moshix](https://www.youtube.com/channel/UCR1ajTWGiUtiAv8X-hpBY7w) YouTube channel for many in-depth discussions on mainframe archaeology.
 
 A couple of interesting factoids I learned from moshix -- aside from his encyclopedic and invaluable knowledge of the important bits -- are:
 
@@ -37,9 +37,9 @@ A couple of interesting factoids I learned from moshix -- aside from his encyclo
 After all these years, the original 3270 documentation is out of print. Some second-hand manuals are available through Amazon but at exorbitant prices.
 
 * The [Reference Booklet](https://www.amazon.com/Information-Display-System-Reference-GX20-1878-4/dp/B003MADXUY/ref=sr_1_9?ie=UTF8&qid=1522950757&sr=8-9&keywords=IBM+3270) would've been very useful but it is out of print.
-* I might've leaned a lot from this [IBM PC 3270 Emulation](https://www.amazon.com/PC-Mainframe-Connection-3270-Emulation/dp/B00DD6XJ7O/ref=sr_1_14?ie=UTF8&qid=1522950847&sr=8-14&keywords=IBM+3270) but I balked at its $105 cost.
+* I might've leaned a lot from this [IBM PC 3270 Emulation](https://www.amazon.com/PC-Mainframe-Connection-3270-Emulation/dp/B00DD6XJ7O/ref=sr_1_14?ie=UTF8&qid=1522950847&sr=8-14&keywords=IBM+3270) book but I balked at its $105 cost.
 
-In the end, there was one resource I counted heavily on. It is hard to read but dead-on accurate. Hats off to the original writers who did an amazing job:
+In the end, there was one resource I counted heavily on. It is hard to read but dead-on accurate. Hats off to the original writers who did an amazing job.
 
 * [3270 Data Stream Programmer's Reference](http://publibz.boulder.ibm.com/cgi-bin/bookmgr_OS390/BOOKS/CN7P4000/CCONTENTS?DT=19920626112004)
 
@@ -50,7 +50,7 @@ Finally, these two documents are great introductions, but you can't count on the
 
 ## How to Run in Development Mode
 
-> This is the only way for now, until I package EL-3270 properly as a standalone desktop app which is after all the point of Electron.
+> This is the only way for now, until I package EL-3270 properly as a standalone desktop app -- which is after all the point of Electron.
 
 First, unless you have access to a host that supports 3270 connections, you should run TK4. All the screenshots here are taken using TK4. On my development system:
 
@@ -83,7 +83,7 @@ npm run electron
 
 Self-explanatory meta functions are triggered by the icons on the top row: connect, disconnect, show extended keyboard (more below), configuration and help.
 
-> The Help page is in a pitiful state at the moment, just a placeholder.
+> The Help page is in a pitiful state at the moment and is just a placeholder.
 
 As you change the size of the window, the 3270 font scales to best fit the available space.
 

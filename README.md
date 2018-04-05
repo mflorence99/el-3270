@@ -14,6 +14,7 @@ I wanted -- and certainly failed -- to present a wrapper interface and underlyin
 * [Angular Material](https://material.angular.io/) for UI components.
 * [Font Awesome](https://fontawesome.com)'s awesome library of icons.
 * The amazing [ngxs](https://ngxs.gitbooks.io/ngxs/) state management pattern.
+* Geoff Zhu's [electron-capture]https://github.com/GeoffZhu/electron-capture) to simulate the 3270's print screen functionality.
 
 In addition, I factored out some interesting code for use in other projects of mine:
 
@@ -62,6 +63,7 @@ One time only, you'll need to grab the code:
 
 ```
 git clone https://github.com/mflorence99/el-3270.git
+cd el-3270
 npm install
 ```
 

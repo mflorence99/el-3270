@@ -2,7 +2,7 @@
 
 EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulator for the modern age. Why in earth is one needed, almost 50 years after the devices were first introduced in 1971? Of course, there is no need at all, I just did this for fun, as a voyage through computer archaeology. I don't expect anyone will ever use it as an actual emulator but I hope it showcases some programming techniques of current interest and illustrates how these historically important devices worked.
 
-> EL-3270 is substantially complete, only missing support for the `MF`, `PT` and `EUA` orders and the Read Buffer command. It is in minor flux until then.
+> EL-3270 is substantially complete, only missing support for the `PT` order. It is in minor flux until then.
 
 ## Technology Stack
 
@@ -82,8 +82,6 @@ npm run electron
 ## UI Tour
 
 Self-explanatory meta functions are triggered by the icons on the top row: connect, disconnect, show extended keyboard (more below), configuration and help.
-
-> The Help page is in a pitiful state at the moment and is just a placeholder.
 
 As you change the size of the window, the 3270 font scales to best fit the available space.
 

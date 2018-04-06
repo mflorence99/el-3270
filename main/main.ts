@@ -26,7 +26,7 @@ app.on('ready', () => {
   });
   // TODO: also temporary -- not deploying from dist to get hot reload
   theWindow.loadURL('http://localhost:4200');
-  // theWindow.setMenu(null);
+  theWindow.setMenu(null);
   theWindow.webContents.openDevTools();
   theWindow.on('blur', () => {
     theWindow.webContents.send('focused', false);

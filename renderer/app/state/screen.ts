@@ -10,6 +10,10 @@ export class ClearCellValue {
   constructor(public readonly payload: number) {}
 }
 
+export class EraseUnprotected {
+  constructor(public readonly payload: {from, to}) {}
+}
+
 export class EraseUnprotectedScreen {
   constructor(public readonly payload: ScreenStateModel) {}
 }
@@ -20,6 +24,10 @@ export class ReplaceScreen {
 
 export class ResetMDT {
   constructor(public readonly payload: any = null) {}
+}
+
+export class UpdateCellAttributes {
+  constructor(public readonly payload: {cellAt, typeCode, attributes}) {}
 }
 
 export class UpdateCellValue {
@@ -61,6 +69,27 @@ export interface ScreenStateModel {
     }
   }
 
+  @Action(EraseUnprotected)
+  eraseUnprotected({ getState, setState }: StateContext<ScreenStateModel>,
+                   { payload }: EraseUnprotected) {
+    const erased = { ...getState() };
+    let attributes;
+    erased.cells
+      // awkward! we have to reset all the character attrributes too
+      .filter(cell => {
+        if (cell.attribute)
+          attributes = cell.attributes;
+        return true;
+      })
+      .filter(cell => cell && !(cell.attribute || cell.attributes.protect))
+      .filter((cell, ix) => (ix >= payload.from) && (ix < payload.to))
+      .forEach(cell =>  {
+        cell.attributes = Attributes.from(attributes);
+        cell.value = null;
+      });
+    setState({...erased});
+  }
+
   @Action(EraseUnprotectedScreen)
   eraseUnprotectedScreen({ getState, setState }: StateContext<ScreenStateModel>,
                          { payload }: EraseUnprotectedScreen) {
@@ -93,6 +122,15 @@ export interface ScreenStateModel {
       cell.attributes.modified = false;
     });
     setState({...reset});
+  }
+
+  @Action(UpdateCellAttributes)
+  updateCellAttributes({ getState, setState }: StateContext<ScreenStateModel>,
+                       { payload }: UpdateCellAttributes) {
+    const updated = { ...getState() };
+    const cell = updated.cells[payload.cellAt];
+    cell.attributes.modify(payload.typeCode, payload.attributes);
+    setState({...updated});
   }
 
   @Action(UpdateCellValue)

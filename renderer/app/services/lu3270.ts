@@ -2,8 +2,9 @@ import { AID, Command, Op, Order, QCode, SFID } from './types';
 import { AIDLookup, CommandLookup, LT, OpLookup, SFIDLookup } from './constants';
 import { Alarm, Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
 import { ApplicationRef, Injectable } from '@angular/core';
-import { EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
+import { EraseUnprotected, EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
 import { InputDataStream, OutputDataStream } from './data-stream';
+import { ScreenStateModel, UpdateCellAttributes } from '../state/screen';
 import { a2e, e2a } from 'ellib/lib/utils/convert';
 import { addressFromBytes, addressToBytes, bytesFromDump } from './utils';
 import { dump, toHex } from 'ellib/lib/utils';
@@ -11,7 +12,6 @@ import { dump, toHex } from 'ellib/lib/utils';
 import { Attributes } from './attributes';
 import { Cell } from './cell';
 import { ElectronService } from 'ngx-electron';
-import { ScreenStateModel } from '../state/screen';
 import { StatusStateModel } from '../state/status';
 import { Store } from '@ngxs/store';
 import { WCC } from './wcc';
@@ -260,7 +260,7 @@ export class LU3270Service {
     const command: Command = istream.next();
     const wcc = WCC.fromByte(istream.next());
     console.groupCollapsed(`%cHost -> 3270 Command ${CommandLookup[command]} ${wcc.toString()}`, 'color: brown');
-    let address, attributes, count, value, chars = [];
+    let address, attributes, byte, count, value, chars = [];
     while (istream.hasNext()) {
       const order = istream.next();
       // log actual data
@@ -301,7 +301,7 @@ export class LU3270Service {
           break;
         case Order.RA:
           address = addressFromBytes([istream.next(), istream.next()]);
-          const byte = istream.next();
+          byte = istream.next();
           value = (byte === 0x00)? null : e2a([byte]);
           console.log(`%cRA %c${this.addressAsRowCol(address)} ${value}`, 'color: black', 'color: gray');
           break;
@@ -396,7 +396,7 @@ export class LU3270Service {
     }
     ostream.putBytes(LT);
     const data: Uint8Array = ostream.toArray();
-    dump(data, `3270 -> Host Read Modified ${all? 'All' : ''}`, true, 'green');
+    dump(data, `3270 -> Host Read Modified${all? 'All' : ''}`, true, 'green');
     // dump the orders
     const slice = data.slice(0, data.length - LT.length);
     this.logInboundOrders(new InputDataStream(slice));
@@ -557,18 +557,18 @@ export class LU3270Service {
     const command: Command = istream.next();
     switch (command) {
       case Command.EAU:
-        retVal = this.writeOrdersAndData(istream);
+        retVal = this.writeOrdersAndData(istream, actions);
         actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
         break;
       case Command.EW:
       case Command.EWA:
         this.address = 0;
         this.cursorAt = 0;
-        retVal = this.writeOrdersAndData(istream, true);
+        retVal = this.writeOrdersAndData(istream, actions, true);
         actions.push(new ReplaceScreen({ cells: retVal.cells }));
         break;
       case Command.W:
-        retVal = this.writeOrdersAndData(istream);
+        retVal = this.writeOrdersAndData(istream, actions);
         actions.push(new UpdateScreen({ cells: retVal.cells }));
         break;
       case Command.WSF:
@@ -589,10 +589,12 @@ export class LU3270Service {
   }
 
   private writeOrdersAndData(istream: InputDataStream,
+                             actions: any[],
                              fill = false): { wcc: WCC, cells: Cell[] } {
     this.logOutboundOrders(InputDataStream.from(istream));
     // these are the individual cells on the screen
     // we fill with dummy protected fields on erase
+    let attributes, byte, bytes, count, eraseTo, repeatTo, typeCode, value;
     const cells = this.initCells(fill);
     const wcc = WCC.fromByte(istream.next());
     while (istream.hasNext()) {
@@ -603,7 +605,7 @@ export class LU3270Service {
           cells[this.address++] = new Cell(null, this.attributes, true);
           break;
         case Order.SFE:
-          const count = istream.next() * 2;
+          count = istream.next() * 2;
           this.attributes = Attributes.fromBytes(istream.nextBytes(count));
           cells[this.address++] = new Cell(null, this.attributes, true);
           break;
@@ -611,11 +613,17 @@ export class LU3270Service {
           this.address = addressFromBytes([istream.next(), istream.next()]);
           break;
         case Order.SA:
-          const typeCode = istream.peek();
-          const attributes = Attributes.fromBytes(istream.nextBytes(2));
+          typeCode = istream.peek();
+          attributes = Attributes.fromBytes(istream.nextBytes(2));
           this.attributes.modify(typeCode, attributes);
           break;
         case Order.MF:
+          count = istream.next() * 2;
+          bytes = istream.nextBytes(count);
+          attributes = Attributes.fromBytes(bytes);
+          for (let ix = 0; ix < count; ix += 2)
+            actions.push(new UpdateCellAttributes({cellAt: this.address, typeCode, attributes}));
+          this.address += 1;
           break;
         case Order.IC:
           this.cursorAt = this.address;
@@ -623,9 +631,9 @@ export class LU3270Service {
         case Order.PT:
           break;
         case Order.RA:
-          const repeatTo = addressFromBytes([istream.next(), istream.next()]);
-          const byte = istream.next();
-          const value = (byte === 0x00)? null : e2a([byte]);
+          repeatTo = addressFromBytes([istream.next(), istream.next()]);
+          byte = istream.next();
+          value = (byte === 0x00)? null : e2a([byte]);
           const ra = (from, to) => {
             while (from < to)
               cells[from++] = new Cell(value, this.attributes);
@@ -641,6 +649,15 @@ export class LU3270Service {
           this.address = repeatTo;
           break;
         case Order.EUA:
+          eraseTo = addressFromBytes([istream.next(), istream.next()]);
+          if (this.address === eraseTo)
+            actions.push(new EraseUnprotected({from: 0, to: this.numCols * this.numRows}));
+          else if (this.address < eraseTo)
+            actions.push(new EraseUnprotected({from: this.address, to: eraseTo}));
+          else {
+            actions.push(new EraseUnprotected({from: this.address, to: this.numCols * this.numRows}));
+            actions.push(new EraseUnprotected({from: 0, to: eraseTo}));
+          }
           break;
         default:
           // if it isn't an order, then treat it as data
@@ -664,28 +681,29 @@ export class LU3270Service {
       // NOTE: there are a million SFIDs and we handle only what we need
       const sfid: SFID = istream.next();
       let data: Uint8Array = null;
+      let cursorAt, cells;
       switch (sfid) {
         case SFID.READ_PARTITION:
           const op: Op = istream.next();
           switch (op) {
             case Op.RB:
               if (this.screenSnapshot && this.statusSnapshot) {
-                const cursorAt = this.statusSnapshot.cursorAt;
-                const cells = this.screenSnapshot.cells;
+                cursorAt = this.statusSnapshot.cursorAt;
+                cells = this.screenSnapshot.cells;
                 data = this.readBuffer(AID.DEFAULT, cursorAt, cells);
               }
               break;
             case Op.RM:
               if (this.screenSnapshot && this.statusSnapshot) {
-                const cursorAt = this.statusSnapshot.cursorAt;
-                const cells = this.screenSnapshot.cells;
+                cursorAt = this.statusSnapshot.cursorAt;
+                cells = this.screenSnapshot.cells;
                 data = this.readModified(AID.DEFAULT, cursorAt, cells);
               }
               break;
             case Op.RMA:
               if (this.screenSnapshot && this.statusSnapshot) {
-                const cursorAt = this.statusSnapshot.cursorAt;
-                const cells = this.screenSnapshot.cells;
+                cursorAt = this.statusSnapshot.cursorAt;
+                cells = this.screenSnapshot.cells;
                 data = this.readModifiedAll(AID.DEFAULT, cursorAt, cells);
               }
               break;

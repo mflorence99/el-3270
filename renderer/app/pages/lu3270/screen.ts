@@ -46,7 +46,7 @@ export class ScreenComponent extends LifecycleComponent
     this.setup = debounce(() => {
       // NOTE: these are magic numbers for the 3270 font based on a nominal
       // 18px size and a hack that forces the padding into the stylesheet
-      this.el.style.padding = '8px 16px 16px 8px';
+      this.el.style.padding = '8px 16px';
       const cx = (this.prefs.numCols * 9.65625) + 32;
       const cy = (this.prefs.numRows * 21) + 16;
       const scaleX = this.el.offsetWidth / cx;

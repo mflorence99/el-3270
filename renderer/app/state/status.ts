@@ -2,6 +2,10 @@ import { Action, State, StateContext } from '@ngxs/store';
 
 /** NOTE: actions must come first because of AST */
 
+export class Alarm {
+  constructor(public readonly payload: boolean) {}
+}
+
 export class Connected {
   constructor(public readonly payload: boolean) {}
 }
@@ -27,6 +31,7 @@ export class Waiting {
 }
 
 export interface StatusStateModel {
+  alarm: boolean;
   connected: boolean;
   cursorAt: number;
   error: boolean;
@@ -39,6 +44,7 @@ export interface StatusStateModel {
 @State<StatusStateModel>({
   name: 'status',
   defaults: {
+    alarm: false,
     connected: false,
     cursorAt: 0,
     error: false,
@@ -48,6 +54,12 @@ export interface StatusStateModel {
     waiting: false
   }
 }) export class StatusState {
+
+  @Action(Alarm)
+  alarm({ getState, patchState }: StateContext<StatusStateModel>,
+        { payload }: Alarm) {
+    patchState({alarm: payload});
+  }
 
   @Action(Connected)
   connected({ getState, patchState }: StateContext<StatusStateModel>,

@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input } from '@angular/core';
+import { Alarm, StatusStateModel } from '../../state/status';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
 
+import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
+import { OnChange } from 'ellib/lib/decorators/onchange';
 import { PrefsStateModel } from '../../state/prefs';
 import { ScreenStateModel } from '../../state/screen';
-import { StatusStateModel } from '../../state/status';
+import { Store } from '@ngxs/store';
 
 /**
  * Status bar component
@@ -15,14 +18,19 @@ import { StatusStateModel } from '../../state/status';
   templateUrl: 'statusbar.html'
 })
 
-export class StatusbarComponent  {
+export class StatusbarComponent extends LifecycleComponent {
 
   @Input() prefs = {} as PrefsStateModel;
   @Input() screen = {} as ScreenStateModel;
   @Input() status = {} as StatusStateModel;
 
+  @ViewChild('ding') ding;
+
   /** ctor */
-  constructor(private element: ElementRef) { }
+  constructor(private element: ElementRef,
+              private store: Store) {
+    super();
+  }
 
   /** Compute colimn from cursor */
   colNum(): number {
@@ -34,11 +42,22 @@ export class StatusbarComponent  {
     return Math.trunc(this.status.cursorAt / this.prefs.numCols) + 1;
   }
 
-  // bind OnChange handlers
-
+  /** Font size change reported */
   fontSize(fontSize: string) {
     const el = this.element.nativeElement;
     el.style.fontSize = fontSize;
+  }
+
+  // bind OnChange handlers
+
+  @OnChange('status') soundAlarm() {
+    if (this.status && this.ding.nativeElement) {
+      if (this.status.alarm) {
+        this.ding.nativeElement
+          .play()
+          .then(() => this.store.dispatch(new Alarm(false)));
+      }
+    }
   }
 
 }

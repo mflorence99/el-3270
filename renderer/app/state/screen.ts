@@ -1,5 +1,5 @@
 import { Action, State, StateContext, Store } from '@ngxs/store';
-import { CursorAt, ErrorMessage, KeyboardLocked } from './status';
+import { Alarm, CursorAt, ErrorMessage, KeyboardLocked } from './status';
 
 import { Attributes } from '../services/attributes';
 import { Cell } from '../services/cell';
@@ -48,8 +48,11 @@ export interface ScreenStateModel {
                  { payload }: ClearCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload - 1];
-    if (cell.attribute || cell.attributes.protect)
-      this.store.dispatch([new ErrorMessage('PROT'), new KeyboardLocked(true)]);
+    if (cell.attribute || cell.attributes.protect) {
+      this.store.dispatch([new ErrorMessage('PROT'),
+                           new KeyboardLocked(true),
+                           new Alarm(true)]);
+    }
     else {
       cell.attributes.modified = false;
       cell.value = null;
@@ -97,10 +100,16 @@ export interface ScreenStateModel {
                   { payload }: UpdateCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload.cursorAt];
-    if (cell.attribute || cell.attributes.protect)
-      this.store.dispatch([new ErrorMessage('PROT'), new KeyboardLocked(true)]);
-    else if (cell.attributes.numeric && !payload.value.match(/[0-9],\.-/g))
-      this.store.dispatch([new ErrorMessage('NUM'), new KeyboardLocked(true)]);
+    if (cell.attribute || cell.attributes.protect) {
+      this.store.dispatch([new ErrorMessage('PROT'),
+                           new KeyboardLocked(true),
+                           new Alarm(true)]);
+    }
+    else if (cell.attributes.numeric && !payload.value.match(/[0-9],\.-/g)) {
+      this.store.dispatch([new ErrorMessage('NUM'),
+                           new KeyboardLocked(true),
+                           new Alarm(true)]);
+    }
     else {
       cell.attributes.modified = true;
       cell.value = payload.value;

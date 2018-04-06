@@ -1,6 +1,6 @@
 import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Alarm, CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
-import { CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
 
 import { AID } from '../../services/types';
 import { AIDLookup } from '../../services/constants';
@@ -99,8 +99,11 @@ export class ScreenComponent extends LifecycleComponent
       }
     }
     // NOTE: Escape can get us out of a keyboard locked state
-    if (event.code === 'Escape')
-      this.store.dispatch([new ErrorMessage(''), new KeyboardLocked(false)]);
+    if (event.code === 'Escape') {
+      this.store.dispatch([new ErrorMessage(''),
+                           new KeyboardLocked(false),
+                           new Alarm(false)]);
+    }
     this.application.tick();
     event.preventDefault();
   }

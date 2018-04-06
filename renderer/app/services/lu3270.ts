@@ -1,7 +1,7 @@
 import { AID, Command, Op, Order, QCode, SFID } from './types';
 import { AIDLookup, CommandLookup, LT, OpLookup, SFIDLookup } from './constants';
+import { Alarm, Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
 import { ApplicationRef, Injectable } from '@angular/core';
-import { Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
 import { EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
 import { InputDataStream, OutputDataStream } from './data-stream';
 import { a2e, e2a } from 'ellib/lib/utils/convert';
@@ -578,10 +578,14 @@ export class LU3270Service {
     if (this.cursorAt != null)
       actions.push(new CursorAt(this.cursorAt));
     // process the WCC
-    if (retVal.wcc && retVal.wcc.resetMDT)
-      actions.push(new ResetMDT());
-    if (retVal.wcc && retVal.wcc.unlockKeyboard)
-      actions.push(new KeyboardLocked(false));
+    if (retVal.wcc) {
+      if (retVal.wcc.alarm)
+        actions.push(new Alarm(true));
+      if (retVal.wcc.resetMDT)
+        actions.push(new ResetMDT());
+      if (retVal.wcc.unlockKeyboard)
+        actions.push(new KeyboardLocked(false));
+    }
   }
 
   private writeOrdersAndData(istream: InputDataStream,

@@ -1,6 +1,7 @@
 import { Color, Highlight, TypeCode } from './types';
 
 import { Cell } from './cell';
+import { six2e } from './utils';
 
 /**
  * Model 3270 field attributes
@@ -96,6 +97,22 @@ export class Attributes {
         this.color = another.color;
         break;
     }
+  }
+
+  /** Convert basic attribute back to a byte */
+  toByte() {
+    let byte = 0b00000000;
+    if (this.protect)
+      byte &= 0b00100000;
+    if (this.numeric)
+      byte &= 0b00010000;
+    if (this.highlight)
+      byte &= 0b00001000;
+    if (this.hidden)
+      byte &= 0b00001100;
+    if (this.modified)
+      byte &= 0b00000001;
+    return six2e[byte];
   }
 
   /** Convert to CSS */

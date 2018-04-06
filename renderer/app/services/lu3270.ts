@@ -11,6 +11,8 @@ import { dump, toHex } from 'ellib/lib/utils';
 import { Attributes } from './attributes';
 import { Cell } from './cell';
 import { ElectronService } from 'ngx-electron';
+import { ScreenStateModel } from '../state/screen';
+import { StatusStateModel } from '../state/status';
 import { Store } from '@ngxs/store';
 import { WCC } from './wcc';
 
@@ -30,6 +32,9 @@ import { WCC } from './wcc';
 
 @Injectable()
 export class LU3270Service {
+
+  screenSnapshot: ScreenStateModel;
+  statusSnapshot: StatusStateModel;
 
   private address: number;
   private attributes: Attributes;
@@ -221,7 +226,7 @@ export class LU3270Service {
     const aid: AID = istream.next();
     const cursorAt = addressFromBytes([istream.next(), istream.next()]);
     console.groupCollapsed(`%c3270 -> Host Command ${AIDLookup[aid]} Cursor ${this.addressAsRowCol(cursorAt)} [${cursorAt}]`, 'color: olive');
-    let address, chars = [];
+    let address, attributes, chars = [];
     while (istream.hasNext()) {
       const order = istream.next();
       // log actual data
@@ -233,7 +238,8 @@ export class LU3270Service {
       // log order
       switch (order) {
         case Order.SF:
-          console.log(`%cSF`, 'color: black');
+          attributes = Attributes.fromByte(istream.next());
+          console.log(`%cSF %c${attributes.toString()}`, 'color: black', 'color: gray');
           break;
         case Order.SBA:
           address = addressFromBytes([istream.next(), istream.next()]);
@@ -339,7 +345,24 @@ export class LU3270Service {
   private readBuffer(aid: AID,
                      cursorAt: number,
                      cells: Cell[]): Uint8Array {
-    return null;
+    const ostream = new OutputDataStream();
+    ostream.put(aid);
+    ostream.putBytes(addressToBytes(cursorAt));
+    // TODO: we currently ONLY support field mode -- see readQCodes
+    cells.forEach(cell => {
+      if (cell.attribute) {
+        ostream.put(Order.SF);
+        ostream.put(cell.attributes.toByte());
+      }
+      else ostream.putBytes(a2e(cell.value));
+    });
+    ostream.putBytes(LT);
+    const data: Uint8Array = ostream.toArray();
+    dump(data, '3270 -> Host Read Buffer', true, '#347235');
+    // dump the orders
+    const slice = data.slice(0, data.length - LT.length);
+    this.logInboundOrders(new InputDataStream(slice));
+    return data;
   }
 
   private readModified(aid: AID,
@@ -353,6 +376,7 @@ export class LU3270Service {
       // adjacent unprotected fields are grouped as a field
       let address = null;
       let chars = [];
+      // TODO: we currently ONLY support field mode -- see readQCodes
       cells.forEach((cell, ix) => {
         if (cell.attribute || cell.attributes.protect) {
           if (address) {
@@ -372,7 +396,7 @@ export class LU3270Service {
     }
     ostream.putBytes(LT);
     const data: Uint8Array = ostream.toArray();
-    dump(data, '3270 -> Host (submit)', true, 'green');
+    dump(data, `3270 -> Host Read Modified ${all? 'All' : ''}`, true, 'green');
     // dump the orders
     const slice = data.slice(0, data.length - LT.length);
     this.logInboundOrders(new InputDataStream(slice));
@@ -471,12 +495,14 @@ export class LU3270Service {
     // next reply modes
     // http://publibz.boulder.ibm.com/cgi-bin/bookmgr_OS390/BOOKS/
     //   CN7P4000/6.42.2?SHELF=&DT=19920626112004&CASE=
+    // TODO: we currently ONLY support field mode
+    // see readBuffer, readModified and readModifiedAll
     const replyModes = [
       SFID.QUERY_REPLY,
       QCode.REPLY_MODES,
       0x00, // field mode
-      0x01, // extended field mode
-      0x02  // character mode
+      // 0x01, // extended field mode
+      // 0x02  // character mode
     ];
     ostream.put16(replyModes.length + 2);
     ostream.putBytes(replyModes);
@@ -639,13 +665,25 @@ export class LU3270Service {
           const op: Op = istream.next();
           switch (op) {
             case Op.RB:
-              data = this.readBuffer(AID.DEFAULT, null, null);
+              if (this.screenSnapshot && this.statusSnapshot) {
+                const cursorAt = this.statusSnapshot.cursorAt;
+                const cells = this.screenSnapshot.cells;
+                data = this.readBuffer(AID.DEFAULT, cursorAt, cells);
+              }
               break;
             case Op.RM:
-              data = this.readModified(AID.DEFAULT, null, null);
+              if (this.screenSnapshot && this.statusSnapshot) {
+                const cursorAt = this.statusSnapshot.cursorAt;
+                const cells = this.screenSnapshot.cells;
+                data = this.readModified(AID.DEFAULT, cursorAt, cells);
+              }
               break;
             case Op.RMA:
-              data = this.readModifiedAll(AID.DEFAULT, null, null);
+              if (this.screenSnapshot && this.statusSnapshot) {
+                const cursorAt = this.statusSnapshot.cursorAt;
+                const cells = this.screenSnapshot.cells;
+                data = this.readModifiedAll(AID.DEFAULT, cursorAt, cells);
+              }
               break;
             // this is the case we don't understand: f3 0005 01ff ff 02
             // it looks like one extra 0xff before the Q op code of 0x012

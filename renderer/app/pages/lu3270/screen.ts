@@ -1,6 +1,6 @@
 import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
-import { CursorAt, ErrorMessage, KeyboardLocked } from '../../state/status';
+import { CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
 
 import { AID } from '../../services/types';
 import { AIDLookup } from '../../services/constants';
@@ -9,7 +9,6 @@ import { LayoutStateModel } from '../../state/layout';
 import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
 import { OnChange } from 'ellib/lib/decorators/onchange';
 import { PrefsStateModel } from '../../state/prefs';
-import { StatusStateModel } from '../../state/status';
 import { Store } from '@ngxs/store';
 import { debounce } from 'ellib/lib/utils';
 
@@ -143,6 +142,16 @@ export class ScreenComponent extends LifecycleComponent
       style.setProperty('--lu3270-rows', String(this.prefs.numRows));
       this.setup();
     }
+  }
+
+  @OnChange('screen') snapshotScreen() {
+    if (this.screen)
+      this.lu3270.screenSnapshot = this.screen;
+  }
+
+  @OnChange('status') snapshotStatus() {
+    if (this.status)
+      this.lu3270.statusSnapshot = this.status;
   }
 
   // lifecycle methods

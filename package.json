@@ -8,6 +8,8 @@
     "serve": "ng serve",
     "build": "ng build --prod --aot",
     "electron": "tsc -p tsconfig.main.json && electron .",
+    "markdown-toc": "markdown-toc",
+    "toc": "markdown-toc -i README.md",
     "tsc": "tsc"
   },
   "private": true,
@@ -45,6 +47,7 @@
     "codelyzer": "^4.0.1",
     "electron": "^1.8.4",
     "eslint": "^4.19.0",
+    "markdown-toc": "^1.2.0",
     "marked": "^0.3.19",
     "moment": "^2.21.0",
     "numeral": "^2.0.6",

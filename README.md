@@ -4,6 +4,20 @@ EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulat
 
 > EL-3270 is substantially complete, only missing support for the `PT` order. It is in minor flux until then.
 
+<!-- toc -->
+
+- [Technology Stack](#technology-stack)
+  * [The MVS 3.8j Tur(n)key 4- System](#the-mvs-38j-turnkey-4--system)
+- [References](#references)
+- [How to Run in Development Mode](#how-to-run-in-development-mode)
+- [UI Tour](#ui-tour)
+  * [Initial Configuration](#initial-configuration)
+  * [Sample Screen](#sample-screen)
+  * [Extended Keyboard](#extended-keyboard)
+- [Debugging Information](#debugging-information)
+
+<!-- tocstop -->
+
 ## Technology Stack
 
 I wanted -- and certainly failed -- to present a wrapper interface and underlying code structure that tries to appear be as fresh and as elegant as the 3270's themselves did to earlier generations of programmers. I have relied heavily on one of the best tech stacks currently available:

@@ -3,31 +3,31 @@ import { Action, State, StateContext } from '@ngxs/store';
 /** NOTE: actions must come first because of AST */
 
 export class Alarm {
-  constructor(public readonly payload: boolean) {}
+  constructor(public readonly payload: boolean) { }
 }
 
 export class Connected {
-  constructor(public readonly payload: boolean) {}
+  constructor(public readonly payload: boolean) { }
 }
 
 export class CursorAt {
-  constructor(public readonly payload: number) {}
+  constructor(public readonly payload: number) { }
 }
 
 export class ErrorMessage {
-  constructor(public readonly payload: string) {}
+  constructor(public readonly payload: string) { }
 }
 
 export class Focused {
-  constructor(public readonly payload: boolean) {}
+  constructor(public readonly payload: boolean) { }
 }
 
 export class KeyboardLocked {
-  constructor(public readonly payload: boolean) {}
+  constructor(public readonly payload: boolean) { }
 }
 
 export class Waiting {
-  constructor(public readonly payload: boolean) {}
+  constructor(public readonly payload: boolean) { }
 }
 
 export interface StatusStateModel {

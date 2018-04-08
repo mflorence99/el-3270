@@ -23,9 +23,9 @@ export class KeyboardComponent extends LifecycleComponent {
 
   @HostBinding('style.maxHeight') maxHeight: string;
 
-  @Input() layout = {} as LayoutStateModel;
-  @Input() screen = {} as ScreenStateModel;
-  @Input() status = {} as StatusStateModel;
+  @Input() layout = { } as LayoutStateModel;
+  @Input() screen = { } as ScreenStateModel;
+  @Input() status = { } as StatusStateModel;
 
   /** ctor */
   constructor(private lu3270: LU3270Service) {

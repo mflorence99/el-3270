@@ -3,7 +3,7 @@ import { Action, State, StateContext } from '@ngxs/store';
 /** NOTE: actions must come first because of AST */
 
 export class UpdatePrefs {
-  constructor(public readonly payload: PrefsStateModel) {}
+  constructor(public readonly payload: PrefsStateModel) { }
 }
 
 export interface PrefsStateModel {

@@ -19,7 +19,7 @@ import { PrefsStateModel } from '../../state/prefs';
 
 export class PrefsComponent extends LifecycleComponent {
 
-  @Input() prefs = {} as PrefsStateModel;
+  @Input() prefs = { } as PrefsStateModel;
 
   prefsForm: FormGroup;
 

@@ -26,10 +26,10 @@ import { debounce } from 'ellib/lib/utils';
 export class ScreenComponent extends LifecycleComponent
                              implements AfterViewInit {
 
-  @Input() layout = {} as LayoutStateModel;
-  @Input() prefs = {} as PrefsStateModel;
-  @Input() screen = {} as ScreenStateModel;
-  @Input() status = {} as StatusStateModel;
+  @Input() layout = { } as LayoutStateModel;
+  @Input() prefs = { } as PrefsStateModel;
+  @Input() screen = { } as ScreenStateModel;
+  @Input() status = { } as StatusStateModel;
 
   @Output() fontSize = new EventEmitter<string>();
 

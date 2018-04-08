@@ -20,9 +20,9 @@ import { Store } from '@ngxs/store';
 
 export class StatusbarComponent extends LifecycleComponent {
 
-  @Input() prefs = {} as PrefsStateModel;
-  @Input() screen = {} as ScreenStateModel;
-  @Input() status = {} as StatusStateModel;
+  @Input() prefs = { } as PrefsStateModel;
+  @Input() screen = { } as ScreenStateModel;
+  @Input() status = { } as StatusStateModel;
 
   @ViewChild('ding') ding;
 

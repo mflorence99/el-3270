@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 
 export class RootCtrlComponent extends LifecycleComponent {
 
-  @Input() prefsForm = {} as PrefsStateModel;
+  @Input() prefsForm = { } as PrefsStateModel;
 
   @Select(LayoutState) layout$: Observable<LayoutStateModel>;
   @Select(PrefsState) prefs$: Observable<PrefsStateModel>;

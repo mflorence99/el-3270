@@ -15,7 +15,7 @@ export class Cell {
 
   /** Convert to CSS */
   toCSS(cursorAt: boolean,
-        focused: boolean): {} {
+        focused: boolean): { } {
     // delegate to attributes
     return this.attributes.toCSS(this, cursorAt, focused);
   }

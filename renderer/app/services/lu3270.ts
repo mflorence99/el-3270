@@ -550,7 +550,7 @@ export class LU3270Service {
 
   private writeCommands(istream: InputDataStream,
                         actions: any[]): void {
-    let retVal: { wcc?: WCC, cells?: Cell[] } = {};
+    let retVal: { wcc?: WCC, cells?: Cell[] } = { };
     // setup decode indexes
     this.attributes = new Attributes();
     this.cursorAt = null;

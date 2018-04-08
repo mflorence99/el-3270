@@ -16,8 +16,8 @@ import { PrefsStateModel } from '../../state/prefs';
 
 export class ToolbarComponent {
 
-  @Input() layout = {} as LayoutStateModel;
-  @Input() prefs = {} as PrefsStateModel;
+  @Input() layout = { } as LayoutStateModel;
+  @Input() prefs = { } as PrefsStateModel;
 
   @Output() connect = new EventEmitter<any>();
   @Output() disconnect = new EventEmitter<any>();

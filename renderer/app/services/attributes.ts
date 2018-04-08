@@ -118,7 +118,7 @@ export class Attributes {
   /** Convert to CSS */
   toCSS(cell: Cell,
         cursorAt: boolean,
-        focused: boolean): {} {
+        focused: boolean): { } {
     const style: any = { };
     if (cursorAt) {
       if (this.hidden) {

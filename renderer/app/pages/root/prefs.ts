@@ -29,15 +29,15 @@ export class PrefsComponent extends LifecycleComponent {
     super();
     // create prefs form controls
     this.prefsForm = this.formBuilder.group({
-        host: ['', Validators.required],
-        port: ['', [
-          Validators.required,
-          Validators.min(23),
-          Validators.max(65535)]
-        ],
-        model: ['', Validators.required],
-        color: ['', Validators.required]
-      });
+      host: ['', Validators.required],
+      port: ['', [
+        Validators.required,
+        Validators.min(23),
+        Validators.max(65535)]
+      ],
+      model: ['', Validators.required],
+      color: ['', Validators.required]
+    });
   }
 
   /** Close drawer */

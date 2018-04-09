@@ -1,5 +1,5 @@
 <button
-  (click)="this.connect.emit()"
+  (click)="connect.emit()"
   [disabled]="!prefs.host || !prefs.port"
   matTooltip="Connect to host"
   mat-icon-button>
@@ -7,7 +7,7 @@
 </button>
 
 <button
-  (click)="this.disconnect.emit()"
+  (click)="disconnect.emit()"
   [disabled]="!prefs.host || !prefs.port"
   matTooltip="Disonnect from host"
   mat-icon-button>
@@ -26,14 +26,14 @@
 <div>&nbsp;</div>
 
 <button
-  (click)="this.openPrefs.emit()"
+  (click)="openPrefs.emit()"
   matTooltip="Edit preferences"
   mat-icon-button>
   <i class="fas fa-cog fa-lg"></i>
 </button>
 
 <button
-  (click)="this.showHelp.emit()"
+  (click)="showHelp.emit()"
   matTooltip="Show help page"
   mat-icon-button>
   <i class="fas fa-question-circle fa-lg"></i>

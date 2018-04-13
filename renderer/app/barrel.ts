@@ -3,7 +3,7 @@ import { MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatInputModu
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { LibModule } from 'ellib/lib/module';
+import { LibModule } from 'ellib';
 import { NgModule } from '@angular/core';
 import { NgxElectronModule } from 'ngx-electron';
 import { ReactiveFormsModule } from '@angular/forms';

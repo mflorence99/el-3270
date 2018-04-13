@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { DrawerPanelComponent } from 'ellib/lib/components/drawer-panel';
-import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
-import { OnChange } from 'ellib/lib/decorators/onchange';
+import { DrawerPanelComponent } from 'ellib';
+import { LifecycleComponent } from 'ellib';
+import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
 
 /**

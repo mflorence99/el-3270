@@ -4,9 +4,9 @@ import { PrefsState, PrefsStateModel, UpdatePrefs } from '../../state/prefs';
 import { Select, Store } from '@ngxs/store';
 
 import { LU3270Service } from '../../services/lu3270';
-import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
+import { LifecycleComponent } from 'ellib';
 import { Observable } from 'rxjs/Observable';
-import { OnChange } from 'ellib/lib/decorators/onchange';
+import { OnChange } from 'ellib';
 import { Router } from '@angular/router';
 
 /**

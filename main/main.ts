@@ -1,7 +1,7 @@
 import { BrowserWindow, app, dialog, ipcMain } from 'electron';
 
 import { Subscription } from 'rxjs/Subscription';
-import { Tn3270 } from 'tn3270/lib/tn3270';
+import { Tn3270 } from 'tn3270';
 
 require('electron-capture');
 const fs = require('fs');

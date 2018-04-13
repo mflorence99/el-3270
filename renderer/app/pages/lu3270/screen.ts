@@ -6,11 +6,11 @@ import { AID } from '../../services/types';
 import { AIDLookup } from '../../services/constants';
 import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
-import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
-import { OnChange } from 'ellib/lib/decorators/onchange';
+import { LifecycleComponent } from 'ellib';
+import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
 import { Store } from '@ngxs/store';
-import { debounce } from 'ellib/lib/utils';
+import { debounce } from 'ellib';
 
 /**
  * Screen component

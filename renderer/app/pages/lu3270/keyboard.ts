@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular
 import { AID } from '../../services/types';
 import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
-import { LifecycleComponent } from 'ellib/lib/components/lifecycle';
-import { OnChange } from 'ellib/lib/decorators/onchange';
+import { LifecycleComponent } from 'ellib';
+import { OnChange } from 'ellib';
 import { ScreenStateModel } from '../../state/screen';
 import { StatusStateModel } from '../../state/status';
 

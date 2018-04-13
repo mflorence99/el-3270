@@ -7,7 +7,7 @@
     "ng": "ng",
     "serve": "ng serve",
     "build": "ng build --prod --aot",
-    "electron": "tsc -p tsconfig.main.json && electron .",
+    "electron": "tsc -p tsconfig.main.json && electron . --ignore-gpu-blacklist",
     "markdown-toc": "markdown-toc",
     "toc": "markdown-toc -i README.md",
     "tsc": "tsc"

@@ -5,9 +5,9 @@ import { ApplicationRef, Injectable } from '@angular/core';
 import { EraseUnprotected, EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
 import { InputDataStream, OutputDataStream } from './data-stream';
 import { ScreenStateModel, UpdateCellAttributes } from '../state/screen';
-import { a2e, e2a } from 'ellib/lib/utils/convert';
+import { a2e, e2a } from 'ellib';
 import { addressFromBytes, addressToBytes, bytesFromDump } from './utils';
-import { dump, toHex } from 'ellib/lib/utils';
+import { dump, toHex } from 'ellib';
 
 import { Attributes } from './attributes';
 import { Cell } from './cell';

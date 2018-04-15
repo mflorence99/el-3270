@@ -1,4 +1,4 @@
-import { Action, State, StateContext, Store } from '@ngxs/store';
+import { Action, State, StateContext } from '@ngxs/store';
 import { Alarm, CursorAt, ErrorMessage, KeyboardLocked } from './status';
 
 import { Attributes } from '../services/attributes';
@@ -49,22 +49,20 @@ export interface ScreenStateModel {
   }
 }) export class ScreenState {
 
-  constructor(private store: Store) { }
-
   @Action(ClearCellValue)
-  clearCellValue({ getState, setState }: StateContext<ScreenStateModel>,
+  clearCellValue({ dispatch, getState, setState }: StateContext<ScreenStateModel>,
                  { payload }: ClearCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload - 1];
     if (cell.attribute || cell.attributes.protect) {
-      this.store.dispatch([new ErrorMessage('PROT'),
-                           new KeyboardLocked(true),
-                           new Alarm(true)]);
+      dispatch([new ErrorMessage('PROT'),
+                new KeyboardLocked(true),
+                new Alarm(true)]);
     }
     else {
       cell.attributes.modified = false;
       cell.value = null;
-      this.store.dispatch(new CursorAt(payload - 1));
+      dispatch(new CursorAt(payload - 1));
       setState({...updated});
     }
   }
@@ -134,24 +132,24 @@ export interface ScreenStateModel {
   }
 
   @Action(UpdateCellValue)
-  updateCellValue({ getState, setState }: StateContext<ScreenStateModel>,
+  updateCellValue({ dispatch, getState, setState }: StateContext<ScreenStateModel>,
                   { payload }: UpdateCellValue) {
     const updated = { ...getState() };
     const cell = updated.cells[payload.cursorAt];
     if (cell.attribute || cell.attributes.protect) {
-      this.store.dispatch([new ErrorMessage('PROT'),
-                           new KeyboardLocked(true),
-                           new Alarm(true)]);
+      dispatch([new ErrorMessage('PROT'),
+                new KeyboardLocked(true),
+                new Alarm(true)]);
     }
     else if (cell.attributes.numeric && !payload.value.match(/[0-9],\.-/g)) {
-      this.store.dispatch([new ErrorMessage('NUM'),
-                           new KeyboardLocked(true),
-                           new Alarm(true)]);
+      dispatch([new ErrorMessage('NUM'),
+                new KeyboardLocked(true),
+                new Alarm(true)]);
     }
     else {
       cell.attributes.modified = true;
       cell.value = payload.value;
-      this.store.dispatch(new CursorAt(payload.cursorAt + 1));
+      dispatch(new CursorAt(payload.cursorAt + 1));
       setState({...updated});
     }
   }

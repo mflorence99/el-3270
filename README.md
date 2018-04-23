@@ -81,16 +81,16 @@ cd el-3270
 npm install
 ```
 
-Next, in another terminal session start the dev server for the Angular client. This way, hot reload of the client is supported.
+Next, start the dev server for the Angular client. This way, hot reload of the client is supported.
 
 ```
 npm run serve
 ```
 
-Finally, in yet another session, start the Electron app itself:
+Finally, in another session, start the Electron app itself:
 
 ```
-npm run electron
+npm run test
 ```
 
 ## UI Tour

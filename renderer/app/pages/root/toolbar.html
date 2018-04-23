@@ -26,6 +26,20 @@
 <div>&nbsp;</div>
 
 <button
+  (click)="reload()"
+  matTooltip="Reload app"
+  mat-icon-button>
+  <i class="fas fa-sync fa-lg"></i>
+</button>
+
+<button
+  (click)="devTools()"
+  matTooltip="Open dev tools"
+  mat-icon-button>
+  <i class="fas fa-bug fa-lg"></i>
+</button>
+
+<button
   (click)="openPrefs.emit()"
   matTooltip="Edit preferences"
   mat-icon-button>

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
+import { ElectronService } from 'ngx-electron';
 import { LayoutStateModel } from '../../state/layout';
 import { PrefsStateModel } from '../../state/prefs';
 
@@ -24,5 +25,20 @@ export class ToolbarComponent {
   @Output() openPrefs = new EventEmitter<any>();
   @Output() showHelp = new EventEmitter<any>();
   @Output() showKeyboard = new EventEmitter<boolean>();
+
+  /** ctor */
+  constructor(private electron: ElectronService) { }
+
+  /** Open dev tools */
+  devTools() {
+    const win = this.electron.remote.getCurrentWindow();
+    win.webContents.openDevTools();
+  }
+
+  /** Reload app */
+  reload() {
+    const win = this.electron.remote.getCurrentWindow();
+    win.webContents.reload();
+  }
 
 }

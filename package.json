@@ -1,16 +1,25 @@
 {
   "name": "el3270",
   "main": "dist/main.js",
-  "version": "0.0.0",
+  "description": "Electron-based IBM 3270 Emulator",
+  "author": "Mark Florence <mflo999@gmail.com>",
+  "version": "1.0.0",
   "license": "MIT",
+  "build": {
+    "appId": "el3270"
+  },
   "scripts": {
-    "ng": "ng",
-    "serve": "ng serve",
-    "build": "ng build --prod --aot",
-    "electron": "tsc -p tsconfig.main.json && electron . --ignore-gpu-blacklist",
-    "markdown-toc": "markdown-toc",
-    "toc": "markdown-toc -i README.md",
-    "tsc": "tsc"
+      "build": "rimraf dist && ng build --prod --aot",
+      "dist": "electron-builder --dir",
+      "ng": "ng",
+      "live": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && electron . --ignore-gpu-blacklist",
+      "markdown-toc": "markdown-toc",
+      "pack": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && electron-builder",
+      "rimraf": "rimraf",
+      "serve": "ng serve",
+      "test": "tsc -p tsconfig.main.json && DEV_MODE=1 electron . --ignore-gpu-blacklist",
+      "toc": "markdown-toc -i README.md",
+      "tsc": "tsc"
   },
   "private": true,
   "dependencies": {
@@ -48,9 +57,12 @@
     "@angular/language-service": "^5.2.0",
     "@types/node": "~6.0.60",
     "codelyzer": "^4.0.1",
+    "devtron": "^1.4.0",
     "electron": "^1.8.4",
+    "electron-builder": "^20.10.0",
     "eslint": "^4.19.0",
     "markdown-toc": "^1.2.0",
+    "rimraf": "^2.6.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3"

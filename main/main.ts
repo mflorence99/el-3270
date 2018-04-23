@@ -1,14 +1,19 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as url from 'url';
+
 import { BrowserWindow, app, dialog, ipcMain } from 'electron';
 
 import { Subscription } from 'rxjs/Subscription';
 import { Tn3270 } from 'tn3270';
 
 require('electron-capture');
-const fs = require('fs');
 
 /**
  * Electron event dispatcher
  */
+
+const isDev = process.env['DEV_MODE'] === '1';
 
 let theConnection: Subscription;
 let theWindow: BrowserWindow;
@@ -16,18 +21,33 @@ let theTn3270: Tn3270;
 
 app.on('ready', () => {
   theWindow = new BrowserWindow({
-    width: 832,
-    height: 1024,
+    width: 800,
+    height: 600,
     resizable: true,
     webPreferences: {
-      // TODO: very temporary -- we remove /dist
-      preload: __dirname.substring(0, __dirname.length - 5) + '/node_modules/electron-capture/src/preload.js'
+      // NOTE: we remove /dist in dev mode
+      preload: (isDev? __dirname.substring(0, __dirname.length - 5) :  __dirname) + '/node_modules/electron-capture/src/preload.js'
     }
   });
-  // TODO: also temporary -- not deploying from dist to get hot reload
-  theWindow.loadURL('http://localhost:4200');
+  if (isDev) {
+    require('devtron').install();
+    theWindow.loadURL(url.format({
+      hostname: 'localhost',
+      pathname: path.join(),
+      port: 4200,
+      protocol: 'http:',
+      slashes: true
+    }));
+  }
+  else {
+    theWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file:',
+      slashes: true
+    }));
+  }
   theWindow.setMenu(null);
-  theWindow.webContents.openDevTools();
+  // event handlers
   theWindow.on('blur', () => {
     theWindow.webContents.send('focused', false);
   });
@@ -39,27 +59,16 @@ app.on('ready', () => {
   theWindow.on('focus', () => {
     theWindow.webContents.send('focused', true);
   });
+  const sendBounds = () =>
+    theWindow.webContents.send('bounds', theWindow.getBounds());
+  theWindow.on('move', sendBounds);
+  theWindow.on('resize', sendBounds);
 });
 
 app.on('window-all-closed', () => {
   if (theConnection)
     theConnection.unsubscribe();
   app.quit();
-});
-
-ipcMain.on('print', (event: any) => {
-  dialog.showSaveDialog(theWindow, {
-    filters: [
-      {name: 'PNG Files', extensions: ['png']},
-    ],
-    title: 'Save EL-3270 Screen Image'
-  }, filename => {
-    if (filename) {
-      theWindow['captureFullPage']((imageStream) => {
-        imageStream.pipe(fs.createWriteStream(filename));
-      });
-    }
-  });
 });
 
 ipcMain.on('connect', (event: any,
@@ -89,6 +98,21 @@ ipcMain.on('disconnect', () => {
     theConnection.unsubscribe();
     theConnection = null;
   }
+});
+
+ipcMain.on('print', (event: any) => {
+  dialog.showSaveDialog(theWindow, {
+    filters: [
+      {name: 'PNG Files', extensions: ['png']},
+    ],
+    title: 'Save EL-3270 Screen Image'
+  }, filename => {
+    if (filename) {
+      theWindow['captureFullPage']((imageStream) => {
+        imageStream.pipe(fs.createWriteStream(filename));
+      });
+    }
+  });
 });
 
 ipcMain.on('write', (event: any,

@@ -2,12 +2,17 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { LayoutState, LayoutStateModel, ShowKeyboard } from '../../state/layout';
 import { PrefsState, PrefsStateModel, UpdatePrefs } from '../../state/prefs';
 import { Select, Store } from '@ngxs/store';
+import { WindowState, WindowStateModel } from '../../state/window';
 
+import { ElectronService } from 'ngx-electron';
 import { LU3270Service } from '../../services/lu3270';
 import { LifecycleComponent } from 'ellib';
 import { Observable } from 'rxjs/Observable';
 import { OnChange } from 'ellib';
 import { Router } from '@angular/router';
+import { SetBounds } from '../../state/window';
+import { debounce } from 'ellib';
+import { take } from 'rxjs/operators';
 
 /**
  * Root controller
@@ -26,12 +31,25 @@ export class RootCtrlComponent extends LifecycleComponent {
 
   @Select(LayoutState) layout$: Observable<LayoutStateModel>;
   @Select(PrefsState) prefs$: Observable<PrefsStateModel>;
+  @Select(WindowState) window$: Observable<WindowStateModel>;
 
   /** ctor */
-  constructor(private lu3270: LU3270Service,
+  constructor(private electron: ElectronService,
+              private lu3270: LU3270Service,
               private router: Router,
               private store: Store) {
     super();
+    // set the initial bounds
+    this.window$.pipe(take(1))
+      .subscribe((window: WindowStateModel) => {
+        const win = this.electron.remote.getCurrentWindow();
+        if (window.bounds)
+          win.setBounds(window.bounds);
+      });
+    // record the bounds when they change
+    this.electron.ipcRenderer.on('bounds', debounce((event, bounds) => {
+      this.store.dispatch(new SetBounds(bounds));
+    }, 250));
   }
 
   /** Connect to host */

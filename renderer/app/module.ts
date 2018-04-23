@@ -54,7 +54,7 @@ const SERVICES = [
       logger: console
     }),
     NgxsStoragePluginModule.forRoot({
-      key: ['prefs', 'layout'],
+      key: ['prefs', 'layout', 'window'],
       storage: StorageOption.LocalStorage
     }),
     RouterModule.forRoot(ROUTES)

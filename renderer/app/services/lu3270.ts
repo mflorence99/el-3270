@@ -162,8 +162,8 @@ export class LU3270Service {
 
   private connected(): void {
     this.store.dispatch([new Connected(true),
-    new Waiting(false),
-    new ReplaceScreen({ cells: [] })]);
+                         new Waiting(false),
+                         new ReplaceScreen({ cells: [] })]);
     this.isConnected = true;
   }
 

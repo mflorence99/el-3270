@@ -1,0 +1,12 @@
+{
+  "dest": "build/installers/",
+  "icon": "resources/Icon.png",
+  "categories": [
+    "Utility"
+  ],
+  "name": "el3270",
+  "productName": "EL3270",
+  "lintianOverrides": [
+    "changelog-file-missing-in-native-package"
+  ]
+}

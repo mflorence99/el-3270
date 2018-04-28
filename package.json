@@ -9,17 +9,13 @@
     "appId": "el3270"
   },
   "scripts": {
-      "build": "rimraf dist && ng build --prod --aot",
-      "dist": "electron-builder --dir",
-      "ng": "ng",
-      "live": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && electron . --ignore-gpu-blacklist",
-      "markdown-toc": "markdown-toc",
-      "pack": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && electron-builder",
-      "rimraf": "rimraf",
-      "serve": "ng serve",
-      "test": "tsc -p tsconfig.main.json && DEV_MODE=1 electron . --ignore-gpu-blacklist",
-      "toc": "markdown-toc -i README.md",
-      "tsc": "tsc"
+    "build": "rimraf dist && ng build --prod --aot",
+    "deb64": "electron-installer-debian --src build/el3270-linux-x64/ --arch amd64 --config installer.json",
+    "live": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && electron . --ignore-gpu-blacklist",
+    "package": "rimraf dist && ng build --prod --aot && tsc -p tsconfig.main.json && rimraf build && electron-packager ./ --out=build",
+    "serve": "ng serve",
+    "test": "tsc -p tsconfig.main.json && DEV_MODE=1 electron . --ignore-gpu-blacklist",
+    "toc": "markdown-toc -i README.md"
   },
   "private": true,
   "dependencies": {
@@ -59,7 +55,6 @@
     "codelyzer": "^4.0.1",
     "devtron": "^1.4.0",
     "electron": "^1.8.4",
-    "electron-builder": "^20.10.0",
     "eslint": "^4.19.0",
     "markdown-toc": "^1.2.0",
     "rimraf": "^2.6.2",

@@ -307,7 +307,7 @@ export class LU3270Service {
           break;
         case Order.EUA:
           address = addressFromBytes([istream.next(), istream.next()]);
-          console.log(`%cEUA %c${this.addressAsRowCol(address)}, 'color: black', 'color: gray'`);
+          console.log(`%cEUA %c${this.addressAsRowCol(address)}`, 'color: black', 'color: gray');
           break;
         default:
           if ((order === 0x00) || (order >= 0x40))

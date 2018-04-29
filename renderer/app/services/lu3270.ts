@@ -592,9 +592,9 @@ export class LU3270Service {
                              actions: any[],
                              fill = false): { wcc: WCC, cells: Cell[] } {
     this.logOutboundOrders(InputDataStream.from(istream));
+    let attributes, byte, bytes, count, eraseTo, repeatTo, typeCode, value;
     // these are the individual cells on the screen
     // we fill with dummy protected fields on erase
-    let attributes, byte, bytes, count, eraseTo, repeatTo, typeCode, value;
     const cells = this.initCells(fill);
     const wcc = WCC.fromByte(istream.next());
     while (istream.hasNext()) {

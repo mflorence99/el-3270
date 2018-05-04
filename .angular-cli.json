@@ -8,8 +8,7 @@
       "root": "renderer",
       "outDir": "dist",
       "assets": [
-        "assets",
-        "favicon.ico"
+        "assets"
       ],
       "index": "index.html",
       "main": "main.ts",
@@ -27,8 +26,7 @@
       ],
       "scripts": [
         "../node_modules/hammerjs/hammer.min.js",
-        "../node_modules/marked/marked.min.js",
-        "../node_modules/numeral/min/numeral.min.js"
+        "../node_modules/marked/marked.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

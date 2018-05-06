@@ -2,24 +2,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 
-import { BrowserWindow, app, dialog, ipcMain } from 'electron';
-
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { Tn3270 } from 'tn3270';
-
-require('electron-capture');
 
 /**
  * Electron event dispatcher
  */
-
+const { BrowserWindow, app, dialog, ipcMain } = require('electron');
+const { default: installExtension } = require('electron-devtools-installer');
 const isDev = process.env['DEV_MODE'] === '1';
 
 let theConnection: Subscription;
-let theWindow: BrowserWindow;
+let theWindow = null;
 let theTn3270: Tn3270;
 
 app.on('ready', () => {
+  require('electron-capture');
   theWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -31,10 +29,21 @@ app.on('ready', () => {
   });
   if (isDev) {
     require('devtron').install();
+    // https://chrome.google.com/webstore/detail/redux-devtools/
+    //   lmhkpmbekcpmknklioeibfkpmmfibljd
+    installExtension('lmhkpmbekcpmknklioeibfkpmmfibljd')
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
+    // https://chrome.google.com/webstore/detail/local-storage-explorer/
+    //   hglfomidogadbhelcfomenpieffpfaeb?hl=en
+    installExtension('hglfomidogadbhelcfomenpieffpfaeb')
+      .then((name) => console.log(`Added Extension:  ${name}`))
+      .catch((err) => console.log('An error occurred: ', err));
     theWindow.loadURL(url.format({
       hostname: 'localhost',
       pathname: path.join(),
       port: 4200,
+      query: {isDev: true},
       protocol: 'http:',
       slashes: true
     }));

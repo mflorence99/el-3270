@@ -7,34 +7,42 @@ import { Cell } from '../services/cell';
 /** NOTE: actions must come first because of AST */
 
 export class ClearCellValue {
+  static readonly type = '[Screen] clear cell value';
   constructor(public readonly payload: number) { }
 }
 
 export class EraseUnprotected {
+  static readonly type = '[Screen] erase unprotected';
   constructor(public readonly payload: {from, to}) { }
 }
 
 export class EraseUnprotectedScreen {
+  static readonly type = '[Screen] erase unprotected screen';
   constructor(public readonly payload: ScreenStateModel) { }
 }
 
 export class ReplaceScreen {
+  static readonly type = '[Screen] replace screen';
   constructor(public readonly payload: ScreenStateModel) { }
 }
 
 export class ResetMDT {
+  static readonly type = '[Screen] reset MDT';
   constructor(public readonly payload: any = null) { }
 }
 
 export class UpdateCellAttributes {
+  static readonly type = '[Screen] update cell attributes';
   constructor(public readonly payload: {cellAt, typeCode, attributes}) { }
 }
 
 export class UpdateCellValue {
+  static readonly type = '[Screen] update cell value';
   constructor(public readonly payload: {cursorAt, value}) { }
 }
 
 export class UpdateScreen {
+  static readonly type = '[Screen] update screen';
   constructor(public readonly payload: ScreenStateModel) { }
 }
 

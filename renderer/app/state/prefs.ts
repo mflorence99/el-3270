@@ -3,6 +3,7 @@ import { Action, State, StateContext } from '@ngxs/store';
 /** NOTE: actions must come first because of AST */
 
 export class UpdatePrefs {
+  static readonly type = '[Prefs] update prefs';
   constructor(public readonly payload: PrefsStateModel) { }
 }
 

@@ -3,6 +3,7 @@ import { Action, State, StateContext } from '@ngxs/store';
 /** NOTE: actions must come first because of AST */
 
 export class ShowKeyboard {
+  static readonly type = '[Layout] show keyboard';
   constructor(public readonly payload: boolean) { }
 }
 

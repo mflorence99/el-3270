@@ -3,10 +3,12 @@ import { Action, State, StateContext } from '@ngxs/store';
 /** NOTE: actions must come first because of AST */
 
 export class SetBounds {
+  static readonly type = '[Window] set bounds';
   constructor(public readonly payload: { x, y, width, height }) { }
 }
 
 export class SetTitle {
+  static readonly type = '[Window] set title';
   constructor(public readonly payload: string) { }
 }
 

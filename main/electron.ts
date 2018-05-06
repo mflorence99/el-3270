@@ -9,7 +9,6 @@ import { Tn3270 } from 'tn3270';
  * Electron event dispatcher
  */
 const { BrowserWindow, app, dialog, ipcMain } = require('electron');
-const { default: installExtension } = require('electron-devtools-installer');
 const isDev = process.env['DEV_MODE'] === '1';
 
 let theConnection: Subscription;
@@ -29,6 +28,7 @@ app.on('ready', () => {
   });
   if (isDev) {
     require('devtron').install();
+    const { default: installExtension } = require('electron-devtools-installer');
     // https://chrome.google.com/webstore/detail/redux-devtools/
     //   lmhkpmbekcpmknklioeibfkpmmfibljd
     installExtension('lmhkpmbekcpmknklioeibfkpmmfibljd')
@@ -43,8 +43,8 @@ app.on('ready', () => {
       hostname: 'localhost',
       pathname: path.join(),
       port: 4200,
-      query: {isDev: true},
       protocol: 'http:',
+      query: {isDev: true},
       slashes: true
     }));
   }

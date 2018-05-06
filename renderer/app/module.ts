@@ -15,8 +15,6 @@ import { RootPageComponent } from './pages/root/page';
 import { RootPageModule } from './pages/root/module';
 import { states } from './state/app';
 
-declare var DEV_MODE: boolean;
-
 /**
  * el-3270 module definition
  */
@@ -60,7 +58,7 @@ const SERVICES = [
       key: ['prefs', 'layout', 'window'],
       storage: StorageOption.LocalStorage
     }),
-    NgxsReduxDevtoolsPluginModule.forRoot({disabled: !DEV_MODE}),
+    NgxsReduxDevtoolsPluginModule.forRoot({disabled: !window['DEV_MODE']}),
     RouterModule.forRoot(ROUTES)
   ],
 

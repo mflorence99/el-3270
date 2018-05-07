@@ -64,18 +64,16 @@ Finally, these two documents are great introductions, but you can't count on the
 
 ## How to Run in Development Mode
 
-> This is the only way for now, until I package EL-3270 properly as a standalone desktop app -- which is after all the point of Electron.
-
 First, unless you have access to a host that supports 3270 connections, you should run TK4. All the screenshots here are taken using TK4. On my development system:
 
-```
+```sh
 cd /mvs38
 ./mvs
 ```
 
-One time only, you'll need to grab the code:
+One time only, you'll need to grab the code.
 
-```
+```sh
 git clone https://github.com/mflorence99/el-3270.git
 cd el-3270
 npm install
@@ -83,14 +81,42 @@ npm install
 
 Next, start the dev server for the Angular client. This way, hot reload of the client is supported.
 
-```
+```sh
 npm run serve
 ```
 
-Finally, in another session, start the Electron app itself:
+Finally, in another session, start the Electron app itself.
 
-```
+```sh
 npm run test
+```
+
+## How to Run in Production Mode
+
+> NOTE: this currently only works for Ubuntu / Debian.
+
+> I need to host the installation files.
+
+One time only, you'll need to grab the code.
+
+```sh
+git clone https://github.com/mflorence99/el-3270.git
+cd el-3270
+npm install
+```
+
+Then build the installation files.
+
+```sh
+npm run package
+npm run deb64
+```
+
+Now you can install the app.
+
+```sh
+cd build/installers/
+dpkg el3270_1.0.0_amd64.deb
 ```
 
 ## UI Tour

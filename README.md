@@ -1,6 +1,6 @@
 # EL-3270
 
-EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulator for the modern age. Why in earth is one needed, almost 50 years after the devices were first introduced in 1971? Of course, there is no need at all, I just did this for fun, as a voyage through computer archaeology. I don't expect anyone will ever use it as an actual emulator but I hope it showcases some programming techniques of current interest and illustrates how these historically important devices worked.
+EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulator for the modern age. Why on earth is one needed, almost 50 years after the devices were first introduced in 1971? Of course, there is no need at all, I just did this for fun, as a voyage through computer archaeology. I don't expect anyone will ever use it as an actual emulator but I hope it showcases some programming techniques of current interest and illustrates how these historically important devices worked.
 
 > EL-3270 is substantially complete, only missing support for the `PT` order. It is in minor flux until then.
 

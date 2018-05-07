@@ -10,6 +10,7 @@ EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulat
   * [The MVS 3.8j Tur(n)key 4- System](#the-mvs-38j-turnkey-4--system)
 - [References](#references)
 - [How to Run in Development Mode](#how-to-run-in-development-mode)
+- [How to Run in Production Mode](#how-to-run-in-production-mode)
 - [UI Tour](#ui-tour)
   * [Initial Configuration](#initial-configuration)
   * [Sample Screen](#sample-screen)

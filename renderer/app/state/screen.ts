@@ -71,7 +71,7 @@ export interface ScreenStateModel {
       cell.attributes.modified = false;
       cell.value = null;
       dispatch(new CursorAt(payload - 1));
-      setState({...updated});
+      setState({ ...updated });
     }
   }
 
@@ -93,7 +93,7 @@ export interface ScreenStateModel {
         cell.attributes = Attributes.from(attributes);
         cell.value = null;
       });
-    setState({...erased});
+    setState({ ...erased });
   }
 
   @Action(EraseUnprotectedScreen)
@@ -106,7 +106,7 @@ export interface ScreenStateModel {
         cell.attributes.modified = false;
         cell.value = null;
       });
-    setState({...erased, ...payload});
+    setState({ ...erased, ...payload });
   }
 
   @Action(ReplaceScreen)
@@ -117,7 +117,7 @@ export interface ScreenStateModel {
       replaced.cells[ix] = cell;
     });
     this.propagateUnprotected(replaced.cells);
-    setState({...replaced});
+    setState({ ...replaced });
   }
 
   @Action(ResetMDT)
@@ -127,7 +127,7 @@ export interface ScreenStateModel {
     reset.cells.forEach(cell =>  {
       cell.attributes.modified = false;
     });
-    setState({...reset});
+    setState({ ...reset });
   }
 
   @Action(UpdateCellAttributes)
@@ -136,7 +136,7 @@ export interface ScreenStateModel {
     const updated = { ...getState() };
     const cell = updated.cells[payload.cellAt];
     cell.attributes.modify(payload.typeCode, payload.attributes);
-    setState({...updated});
+    setState({ ...updated });
   }
 
   @Action(UpdateCellValue)
@@ -158,7 +158,7 @@ export interface ScreenStateModel {
       cell.attributes.modified = true;
       cell.value = payload.value;
       dispatch(new CursorAt(payload.cursorAt + 1));
-      setState({...updated});
+      setState({ ...updated });
     }
   }
 
@@ -171,7 +171,7 @@ export interface ScreenStateModel {
         updated.cells[ix] = cell;
     });
     this.propagateUnprotected(updated.cells);
-    setState({...updated});
+    setState({ ...updated });
   }
 
   // private methods

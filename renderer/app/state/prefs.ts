@@ -57,7 +57,7 @@ export interface PrefsStateModel {
         numRows = 27;
         break;
     }
-    setState({...getState(), ...payload, numCols, numRows});
+    setState({ ...getState(), ...payload, numCols, numRows });
   }
 
 }

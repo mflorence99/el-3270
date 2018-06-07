@@ -1,17 +1,16 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { LayoutState, LayoutStateModel, ShowKeyboard } from '../../state/layout';
+import { LifecycleComponent, OnChange, debounce } from 'ellib';
 import { PrefsState, PrefsStateModel, UpdatePrefs } from '../../state/prefs';
 import { Select, Store } from '@ngxs/store';
 import { WindowState, WindowStateModel } from '../../state/window';
 
 import { ElectronService } from 'ngx-electron';
 import { LU3270Service } from '../../services/lu3270';
-import { LifecycleComponent } from 'ellib';
 import { Observable } from 'rxjs/Observable';
-import { OnChange } from 'ellib';
 import { Router } from '@angular/router';
 import { SetBounds } from '../../state/window';
-import { debounce } from 'ellib';
+import { config } from '../../config';
 import { take } from 'rxjs/operators';
 
 /**
@@ -49,7 +48,7 @@ export class RootCtrlComponent extends LifecycleComponent {
     // record the bounds when they change
     this.electron.ipcRenderer.on('bounds', debounce((event, bounds) => {
       this.store.dispatch(new SetBounds(bounds));
-    }, 250));
+    }, config.setBoundsThrottle));
   }
 
   /** Connect to host */

@@ -1,16 +1,15 @@
 import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Alarm, CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
+import { LifecycleComponent, OnChange, debounce } from 'ellib';
 
 import { AID } from '../../services/types';
 import { AIDLookup } from '../../services/constants';
 import { LU3270Service } from '../../services/lu3270';
 import { LayoutStateModel } from '../../state/layout';
-import { LifecycleComponent } from 'ellib';
-import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
 import { Store } from '@ngxs/store';
-import { debounce } from 'ellib';
+import { config } from '../../config';
 
 /**
  * Screen component
@@ -57,7 +56,7 @@ export class ScreenComponent extends LifecycleComponent
       else fontSize = `${18 * scaleY}px`;
       this.el.style.fontSize = fontSize;
       this.fontSize.emit(fontSize);
-    }, 250);
+    }, config.fontSizeThrottle);
   }
 
   /** Position the cursor based on a mouse click */

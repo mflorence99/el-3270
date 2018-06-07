@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { DrawerPanelComponent, LifecycleComponent, OnChange } from 'ellib';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { DrawerPanelComponent } from 'ellib';
-import { LifecycleComponent } from 'ellib';
-import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
+import { config } from '../../config';
 
 /**
  * Prefs component
@@ -32,8 +31,8 @@ export class PrefsComponent extends LifecycleComponent {
       host: ['', Validators.required],
       port: ['', [
         Validators.required,
-        Validators.min(23),
-        Validators.max(65535)]
+        Validators.min(config.portMin),
+        Validators.max(config.portMax)]
       ],
       model: ['', Validators.required],
       color: ['', Validators.required]

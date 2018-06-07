@@ -1,8 +1,7 @@
 import { Alarm, StatusStateModel } from '../../state/status';
 import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { LifecycleComponent, OnChange } from 'ellib';
 
-import { LifecycleComponent } from 'ellib';
-import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
 import { ScreenStateModel } from '../../state/screen';
 import { Store } from '@ngxs/store';

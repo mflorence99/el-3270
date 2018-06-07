@@ -3,6 +3,7 @@ import { MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatInputModu
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LibModule } from 'ellib';
 import { NgModule } from '@angular/core';
 import { NgxElectronModule } from 'ngx-electron';
@@ -17,6 +18,7 @@ const MODULES = [
   BrowserModule,
   BrowserAnimationsModule,
   CommonModule,
+  FontAwesomeModule,
   LibModule,
   MatButtonModule,
   MatButtonToggleModule,

@@ -1,23 +1,32 @@
 <div
   *ngIf="status.connected" >
-  <i class="fas fa-desktop"></i>
+  <fa-icon
+    [icon]="['fas', 'desktop']">
+  </fa-icon>
   {{ prefs.model }}
 </div>
 
 <div
   *ngIf="!status.connected" >
-  <i class="fas fa-power-off"></i>
+  <fa-icon
+    [icon]="['fas', 'power-off']">
+  </fa-icon>
 </div>
 
 <div
   [ngStyle]="{visibility: status.waiting? 'visible' : 'hidden'}">
-  <i class="fas fa-spinner fa-pulse"></i>
+  <fa-icon
+    [icon]="['fas', 'spinner']"
+    [pulse]="true">
+  </fa-icon>
   WAIT
 </div>
 
 <div
   [ngStyle]="{color: 'var(--error-color)', visibility: status.error? 'visible' : 'hidden'}">
-  <i class="fas fa-times"></i>
+  <fa-icon
+    [icon]="['fas', 'times']">
+  </fa-icon>
   {{ status.message }}
 </div>
 

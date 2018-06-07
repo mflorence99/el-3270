@@ -1,4 +1,4 @@
-import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Alarm, CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
 import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
 import { LifecycleComponent, OnChange, debounce } from 'ellib';
@@ -36,8 +36,7 @@ export class ScreenComponent extends LifecycleComponent
   private setup: Function;
 
   /** ctor */
-  constructor(private application: ApplicationRef,
-              private element: ElementRef,
+  constructor(private element: ElementRef,
               private lu3270: LU3270Service,
               private store: Store) {
     super();
@@ -45,15 +44,15 @@ export class ScreenComponent extends LifecycleComponent
     this.setup = debounce(() => {
       // NOTE: these are magic numbers for the 3270 font based on a nominal
       // 18px size and a hack that forces the padding into the stylesheet
-      this.el.style.padding = '8px 16px';
-      const cx = (this.prefs.numCols * 9.65625) + 32;
-      const cy = (this.prefs.numRows * 21) + 16;
+      this.el.style.padding = `${config.magic.paddingTop}px ${config.magic.paddingRight}px ${config.magic.paddingBottom}px ${config.magic.paddingLeft}px`;
+      const cx = (this.prefs.numCols * config.magic.cxFactor) + config.magic.paddingLeft + config.magic.paddingRight;
+      const cy = (this.prefs.numRows * config.magic.cyFactor) + config.magic.paddingTop + config.magic.paddingBottom;
       const scaleX = this.el.offsetWidth / cx;
       const scaleY = this.el.offsetHeight / cy;
       let fontSize;
       if (scaleX < scaleY)
-        fontSize = `${18 * scaleX}px`;
-      else fontSize = `${18 * scaleY}px`;
+        fontSize = `${config.magic.nominalFontSize * scaleX}px`;
+      else fontSize = `${config.magic.nominalFontSize * scaleY}px`;
       this.el.style.fontSize = fontSize;
       this.fontSize.emit(fontSize);
     }, config.fontSizeThrottle);
@@ -63,7 +62,6 @@ export class ScreenComponent extends LifecycleComponent
   cursorAt(cellID: string): void {
     if (cellID && cellID.startsWith('cell')) {
       this.store.dispatch(new CursorAt(parseInt(cellID.substring(4), 10)));
-      this.application.tick();
     }
   }
 
@@ -78,7 +76,7 @@ export class ScreenComponent extends LifecycleComponent
         this.lu3270.cursorTo(this.status.cursorAt, cursorOp);
       }
       else if (event.code === 'Backspace') {
-        const cursorAt = this.status.cursorAt;
+        const cursorAt = this.lu3270.cursorTo(this.status.cursorAt, 'left');
         this.store.dispatch(new ClearCellValue(cursorAt));
       }
       else if (event.code === 'Enter')
@@ -103,7 +101,6 @@ export class ScreenComponent extends LifecycleComponent
                            new KeyboardLocked(false),
                            new Alarm(false)]);
     }
-    this.application.tick();
     event.preventDefault();
   }
 

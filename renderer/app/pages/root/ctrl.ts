@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { LayoutState, LayoutStateModel, ShowKeyboard } from '../../state/layout';
-import { LifecycleComponent, OnChange, debounce } from 'ellib';
+import { LifecycleComponent, OnChange, debounce, nextTick } from 'ellib';
 import { PrefsState, PrefsStateModel, UpdatePrefs } from '../../state/prefs';
 import { Select, Store } from '@ngxs/store';
 import { WindowState, WindowStateModel } from '../../state/window';
@@ -77,8 +77,14 @@ export class RootCtrlComponent extends LifecycleComponent {
   // bind OnChange handlers
 
   @OnChange('prefsForm') savePrefs() {
-    if (this.prefsForm && this.prefsForm.submitted)
-      this.store.dispatch(new UpdatePrefs(this.prefsForm));
+    if (this.prefsForm && this.prefsForm.submitted) {
+      // TODO: why do we need this in Electron? and only running live?
+      // at worst, running in NgZone should work -- but otherwise a DOM
+      // event is necessary to force change detection
+      nextTick(() => {
+        this.store.dispatch(new UpdatePrefs(this.prefsForm));
+      });
+    }
   }
 
 }

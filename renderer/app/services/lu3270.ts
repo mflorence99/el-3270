@@ -1,8 +1,8 @@
 import { AID, Command, Op, Order, QCode, SFID } from './types';
 import { AIDLookup, CommandLookup, LT, OpLookup, SFIDLookup } from './constants';
 import { Alarm, Connected, CursorAt, ErrorMessage, Focused, KeyboardLocked, Waiting } from '../state/status';
-import { ApplicationRef, Injectable } from '@angular/core';
 import { EraseUnprotected, EraseUnprotectedScreen, ReplaceScreen, ResetMDT, UpdateScreen } from '../state/screen';
+import { Injectable, NgZone } from '@angular/core';
 import { InputDataStream, OutputDataStream } from './data-stream';
 import { ScreenStateModel, UpdateCellAttributes } from '../state/screen';
 import { a2e, dump, e2a, toHex } from 'ellib';
@@ -45,9 +45,9 @@ export class LU3270Service {
   private numRows: number;
 
   /** ctor */
-  constructor(private application: ApplicationRef,
-              private electron: ElectronService,
-              private store: Store) {
+  constructor(private electron: ElectronService,
+              private store: Store,
+              private zone: NgZone) {
     this.electron.ipcRenderer.on('connected', this.connected.bind(this));
     this.electron.ipcRenderer.on('disconnected', this.disconnected.bind(this));
     this.electron.ipcRenderer.on('data', this.dataHandler.bind(this));
@@ -72,7 +72,7 @@ export class LU3270Service {
 
   /** Reposition cursor, relative to its current position */
   cursorTo(cursorAt: number,
-           cursorOp: 'down' | 'left' | 'right' | 'up'): void {
+           cursorOp: 'down' | 'left' | 'right' | 'up'): number {
     const max = this.numCols * this.numRows;
     let cursorTo;
     switch (cursorOp) {
@@ -98,6 +98,7 @@ export class LU3270Service {
         break;
     }
     this.store.dispatch(new CursorAt(cursorTo));
+    return cursorTo;
   }
 
   /** Disconnect from host */
@@ -148,7 +149,6 @@ export class LU3270Service {
     const data = this.readModified(aid, cursorAt, cells);
     this.store.dispatch(new Waiting(true));
     this.electron.ipcRenderer.send('write', data);
-    this.application.tick();
   }
 
   // private methods
@@ -160,10 +160,12 @@ export class LU3270Service {
   }
 
   private connected(): void {
-    this.store.dispatch([new Connected(true),
-                         new Waiting(false),
-                         new ReplaceScreen({ cells: [] })]);
-    this.isConnected = true;
+    this.zone.run(() => {
+      this.store.dispatch([new Connected(true),
+                           new Waiting(false),
+                           new ReplaceScreen({ cells: [] })]);
+      this.isConnected = true;
+    });
   }
 
   private dataHandler(event: any,
@@ -186,29 +188,34 @@ export class LU3270Service {
       this.writeCommands(new InputDataStream(slice), actions);
     }
     // dispatch actions
-    this.store.dispatch([new Waiting(false), ...actions]);
-    this.application.tick();
+    this.zone.run(() => {
+      this.store.dispatch([new Waiting(false), ...actions]);
+    });
   }
 
   private disconnected(): void {
-    this.store.dispatch([new Connected(false),
-    new Waiting(false),
-    new ReplaceScreen({ cells: [] })]);
-    this.isConnected = false;
+    this.zone.run(() => {
+      this.store.dispatch([new Connected(false),
+      new Waiting(false),
+      new ReplaceScreen({ cells: [] })]);
+      this.isConnected = false;
+    });
   }
 
   private errorHandler(event: any,
                        error: string): void {
-    this.store.dispatch([new Connected(false),
-                         new ErrorMessage(error)]);
-    this.isConnected = false;
-    this.application.tick();
+    this.zone.run(() => {
+      this.store.dispatch([new Connected(false),
+                           new ErrorMessage(error)]);
+      this.isConnected = false;
+    });
   }
 
   private focusHandler(event: any,
                        focused: boolean): void {
-    this.store.dispatch(new Focused(focused));
-    this.application.tick();
+    this.zone.run(() => {
+      this.store.dispatch(new Focused(focused));
+    });
   }
 
   private initCells(fill: boolean): Cell[] {
@@ -557,7 +564,7 @@ export class LU3270Service {
     switch (command) {
       case Command.EAU:
         retVal = this.writeOrdersAndData(istream, actions);
-        actions.push(new EraseUnprotectedScreen({ cells: retVal.cells }));
+        actions.push(new EraseUnprotectedScreen());
         break;
       case Command.EW:
       case Command.EWA:

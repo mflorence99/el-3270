@@ -13,12 +13,12 @@ export class ClearCellValue {
 
 export class EraseUnprotected {
   static readonly type = '[Screen] erase unprotected';
-  constructor(public readonly payload: {from, to}) { }
+  constructor(public readonly payload: { from, to }) { }
 }
 
 export class EraseUnprotectedScreen {
   static readonly type = '[Screen] erase unprotected screen';
-  constructor(public readonly payload: ScreenStateModel) { }
+  constructor(public readonly payload?: any) { }
 }
 
 export class ReplaceScreen {
@@ -28,17 +28,17 @@ export class ReplaceScreen {
 
 export class ResetMDT {
   static readonly type = '[Screen] reset MDT';
-  constructor(public readonly payload: any = null) { }
+  constructor(public readonly payload?: any) { }
 }
 
 export class UpdateCellAttributes {
   static readonly type = '[Screen] update cell attributes';
-  constructor(public readonly payload: {cellAt, typeCode, attributes}) { }
+  constructor(public readonly payload: { cellAt, typeCode, attributes }) { }
 }
 
 export class UpdateCellValue {
   static readonly type = '[Screen] update cell value';
-  constructor(public readonly payload: {cursorAt, value}) { }
+  constructor(public readonly payload: { cursorAt, value }) { }
 }
 
 export class UpdateScreen {
@@ -60,8 +60,9 @@ export interface ScreenStateModel {
   @Action(ClearCellValue)
   clearCellValue({ dispatch, getState, setState }: StateContext<ScreenStateModel>,
                  { payload }: ClearCellValue) {
-    const updated = { ...getState() };
-    const cell = updated.cells[payload - 1];
+    const state = getState();
+    state.cells = state.cells.slice(0);
+    const cell = state.cells[payload];
     if (cell.attribute || cell.attributes.protect) {
       dispatch([new ErrorMessage('PROT'),
                 new KeyboardLocked(true),
@@ -70,17 +71,17 @@ export interface ScreenStateModel {
     else {
       cell.attributes.modified = false;
       cell.value = null;
-      dispatch(new CursorAt(payload - 1));
-      setState({ ...updated });
+      setState({ ...state });
     }
   }
 
   @Action(EraseUnprotected)
   eraseUnprotected({ getState, setState }: StateContext<ScreenStateModel>,
                    { payload }: EraseUnprotected) {
-    const erased = { ...getState() };
+    const state = getState();
+    state.cells = state.cells.slice(0);
     let attributes;
-    erased.cells
+    state.cells
       // awkward! we have to reset all the character attrributes too
       .filter(cell => {
         if (cell.attribute)
@@ -93,57 +94,62 @@ export interface ScreenStateModel {
         cell.attributes = Attributes.from(attributes);
         cell.value = null;
       });
-    setState({ ...erased });
+    setState({ ...state });
   }
 
   @Action(EraseUnprotectedScreen)
   eraseUnprotectedScreen({ getState, setState }: StateContext<ScreenStateModel>,
                          { payload }: EraseUnprotectedScreen) {
-    const erased = { ...getState() };
-    erased.cells
+    const state = getState();
+    state.cells = state.cells.slice(0);
+    state.cells
       .filter(cell => cell && !(cell.attribute || cell.attributes.protect))
       .forEach(cell =>  {
         cell.attributes.modified = false;
         cell.value = null;
       });
-    setState({ ...erased, ...payload });
+    setState({ ...state });
   }
 
   @Action(ReplaceScreen)
   replaceScreen({ getState, setState }: StateContext<ScreenStateModel>,
                { payload }: ReplaceScreen) {
-    const replaced = { ...getState() };
+    const state = getState();
+    state.cells = state.cells.slice(0);
     payload.cells.forEach((cell, ix) => {
-      replaced.cells[ix] = cell;
+      state.cells[ix] = cell;
     });
-    this.propagateUnprotected(replaced.cells);
-    setState({ ...replaced });
+    this.propagateUnprotected(state.cells);
+    setState({ ...state });
   }
 
   @Action(ResetMDT)
   resetMDT({ getState, setState }: StateContext<ScreenStateModel>,
            { payload }: ResetMDT) {
-    const reset = { ...getState() };
-    reset.cells.forEach(cell =>  {
+    const state = getState();
+    state.cells = state.cells.slice(0);
+    state.cells.forEach(cell =>  {
       cell.attributes.modified = false;
     });
-    setState({ ...reset });
+    setState({ ...state });
   }
 
   @Action(UpdateCellAttributes)
   updateCellAttributes({ getState, setState }: StateContext<ScreenStateModel>,
                        { payload }: UpdateCellAttributes) {
-    const updated = { ...getState() };
-    const cell = updated.cells[payload.cellAt];
+    const state = getState();
+    state.cells = state.cells.slice(0);
+    const cell = state.cells[payload.cellAt];
     cell.attributes.modify(payload.typeCode, payload.attributes);
-    setState({ ...updated });
+    setState({ ...state });
   }
 
   @Action(UpdateCellValue)
   updateCellValue({ dispatch, getState, setState }: StateContext<ScreenStateModel>,
                   { payload }: UpdateCellValue) {
-    const updated = { ...getState() };
-    const cell = updated.cells[payload.cursorAt];
+    const state = getState();
+    state.cells = state.cells.slice(0);
+    const cell = state.cells[payload.cursorAt];
     if (cell.attribute || cell.attributes.protect) {
       dispatch([new ErrorMessage('PROT'),
                 new KeyboardLocked(true),
@@ -158,20 +164,21 @@ export interface ScreenStateModel {
       cell.attributes.modified = true;
       cell.value = payload.value;
       dispatch(new CursorAt(payload.cursorAt + 1));
-      setState({ ...updated });
+      setState({ ...state });
     }
   }
 
   @Action(UpdateScreen)
   updateScreen({ getState, setState }: StateContext<ScreenStateModel>,
                { payload }: UpdateScreen) {
-    const updated = { ...getState() };
+    const state = getState();
+    state.cells = state.cells.slice(0);
     payload.cells.forEach((cell, ix) => {
       if (cell)
-        updated.cells[ix] = cell;
+        state.cells[ix] = cell;
     });
-    this.propagateUnprotected(updated.cells);
-    setState({ ...updated });
+    this.propagateUnprotected(state.cells);
+    setState({ ...state });
   }
 
   // private methods

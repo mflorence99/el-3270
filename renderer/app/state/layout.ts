@@ -21,7 +21,7 @@ export interface LayoutStateModel {
   @Action(ShowKeyboard)
   showKeyboard({ getState, patchState }: StateContext<LayoutStateModel>,
                { payload }: ShowKeyboard) {
-    patchState({showKeyboard: payload});
+    patchState( {showKeyboard: payload });
   }
 
 }

@@ -65,43 +65,43 @@ export interface StatusStateModel {
   @Action(Alarm)
   alarm({ getState, patchState }: StateContext<StatusStateModel>,
         { payload }: Alarm) {
-    patchState({alarm: payload});
+    patchState({ alarm: payload });
   }
 
   @Action(Connected)
   connected({ getState, patchState }: StateContext<StatusStateModel>,
             { payload }: Connected) {
-    patchState({connected: payload});
+    patchState({ connected: payload });
   }
 
   @Action(CursorAt)
   cursorAt({ getState, patchState }: StateContext<StatusStateModel>,
            { payload }: CursorAt) {
-    patchState({cursorAt: payload});
+    patchState({ cursorAt: payload });
   }
 
   @Action(ErrorMessage)
   errorMessage({ getState, patchState }: StateContext<StatusStateModel>,
                { payload }: ErrorMessage) {
-    patchState({error: !!payload, message: payload});
+    patchState({ error: !!payload, message: payload });
   }
 
   @Action(Focused)
   focused({ getState, patchState }: StateContext<StatusStateModel>,
           { payload }: Focused) {
-    patchState({focused: payload});
+    patchState({ focused: payload });
   }
 
   @Action(KeyboardLocked)
   keyboardLocked({ getState, patchState }: StateContext<StatusStateModel>,
                  { payload }: KeyboardLocked) {
-    patchState({keyboardLocked: payload});
+    patchState({ keyboardLocked: payload });
   }
 
   @Action(Waiting)
   waiting({ getState, patchState }: StateContext<StatusStateModel>,
           { payload }: Waiting) {
-    patchState({waiting: payload});
+    patchState({ waiting: payload });
   }
 
 }

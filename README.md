@@ -106,18 +106,12 @@ cd el-3270
 npm install
 ```
 
-Then build the installation files.
+Then package and install the app.
 
 ```sh
 npm run package
 npm run deb64
-```
-
-Now you can install the app.
-
-```sh
-cd build/installers/
-dpkg el3270_1.0.0_amd64.deb
+npm run deb64-install
 ```
 
 ## UI Tour

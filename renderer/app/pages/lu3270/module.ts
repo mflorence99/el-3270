@@ -1,6 +1,6 @@
 import { BarrelModule } from '../../barrel';
-import { KeyComponent } from './key';
 import { KeyboardComponent } from './keyboard';
+import { KeyComponent } from './key';
 import { LU3270CtrlComponent } from './ctrl';
 import { LU3270PageComponent } from './page';
 import { NgModule } from '@angular/core';

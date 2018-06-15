@@ -1,4 +1,7 @@
-import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
+import { ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
+import { HostBinding } from '@angular/core';
+import { Input } from '@angular/core';
 
 /**
  * Keyboard key component

@@ -1,4 +1,8 @@
-import { AID, Command, Op, Order, SFID } from './types';
+import { AID } from './types';
+import { Command } from './types';
+import { Op } from './types';
+import { Order } from './types';
+import { SFID } from './types';
 
 /**
  * Common constants

@@ -1,6 +1,3 @@
-import { NgxsStoragePluginModule, StorageOption } from '@ngxs/storage-plugin';
-import { RouterModule, Routes } from '@angular/router';
-
 import { BarrelModule } from './barrel';
 import { HelpPageComponent } from './pages/help/page';
 import { HelpPageModule } from './pages/help/module';
@@ -11,9 +8,13 @@ import { NgModule } from '@angular/core';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { RootPageComponent } from './pages/root/page';
 import { RootPageModule } from './pages/root/module';
+import { RouterModule } from '@angular/router';
+import { Routes } from '@angular/router';
 import { states } from './state/app';
+import { StorageOption } from '@ngxs/storage-plugin';
 
 /**
  * el-3270 module definition

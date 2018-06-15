@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-
+import { ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
+import { EventEmitter } from '@angular/core';
+import { Input } from '@angular/core';
 import { LayoutStateModel } from '../../state/layout';
+import { Output } from '@angular/core';
 import { PrefsStateModel } from '../../state/prefs';
 
 /**

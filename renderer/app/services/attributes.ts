@@ -1,7 +1,8 @@
-import { Color, Highlight, TypeCode } from './types';
-
 import { Cell } from './cell';
+import { Color } from './types';
+import { Highlight } from './types';
 import { six2e } from './utils';
+import { TypeCode } from './types';
 
 /**
  * Model 3270 field attributes

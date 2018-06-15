@@ -1,11 +1,15 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { LayoutState, LayoutStateModel } from '../../state/layout';
-import { PrefsState, PrefsStateModel } from '../../state/prefs';
-import { ScreenState, ScreenStateModel } from '../../state/screen';
-import { StatusState, StatusStateModel } from '../../state/status';
-
+import { ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
+import { LayoutState } from '../../state/layout';
+import { LayoutStateModel } from '../../state/layout';
 import { Observable } from 'rxjs/Observable';
+import { PrefsState } from '../../state/prefs';
+import { PrefsStateModel } from '../../state/prefs';
+import { ScreenState } from '../../state/screen';
+import { ScreenStateModel } from '../../state/screen';
 import { Select } from '@ngxs/store';
+import { StatusState } from '../../state/status';
+import { StatusStateModel } from '../../state/status';
 
 /**
  * LU3270 controller

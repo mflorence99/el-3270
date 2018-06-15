@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
-import { LifecycleComponent, OnChange } from 'ellib';
-
 import { AID } from '../../services/types';
-import { LU3270Service } from '../../services/lu3270';
+import { ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
+import { HostBinding } from '@angular/core';
+import { Input } from '@angular/core';
 import { LayoutStateModel } from '../../state/layout';
+import { LifecycleComponent } from 'ellib';
+import { LU3270Service } from '../../services/lu3270';
+import { OnChange } from 'ellib';
 import { ScreenStateModel } from '../../state/screen';
 import { StatusStateModel } from '../../state/status';
 

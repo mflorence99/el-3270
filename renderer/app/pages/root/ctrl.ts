@@ -1,17 +1,27 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LayoutState, LayoutStateModel, ShowKeyboard } from '../../state/layout';
-import { LifecycleComponent, OnChange, debounce, nextTick } from 'ellib';
-import { PrefsState, PrefsStateModel, UpdatePrefs } from '../../state/prefs';
-import { Select, Store } from '@ngxs/store';
-import { WindowState, WindowStateModel } from '../../state/window';
-
-import { ElectronService } from 'ngx-electron';
-import { LU3270Service } from '../../services/lu3270';
-import { Observable } from 'rxjs/Observable';
-import { Router } from '@angular/router';
-import { SetBounds } from '../../state/window';
+import { ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { config } from '../../config';
+import { debounce } from 'ellib';
+import { ElectronService } from 'ngx-electron';
+import { Input } from '@angular/core';
+import { LayoutState } from '../../state/layout';
+import { LayoutStateModel } from '../../state/layout';
+import { LifecycleComponent } from 'ellib';
+import { LU3270Service } from '../../services/lu3270';
+import { nextTick } from 'ellib';
+import { Observable } from 'rxjs/Observable';
+import { OnChange } from 'ellib';
+import { PrefsState } from '../../state/prefs';
+import { PrefsStateModel } from '../../state/prefs';
+import { Router } from '@angular/router';
+import { Select } from '@ngxs/store';
+import { SetBounds } from '../../state/window';
+import { ShowKeyboard } from '../../state/layout';
+import { Store } from '@ngxs/store';
 import { take } from 'rxjs/operators';
+import { UpdatePrefs } from '../../state/prefs';
+import { WindowState } from '../../state/window';
+import { WindowStateModel } from '../../state/window';
 
 /**
  * Root controller

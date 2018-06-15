@@ -1,15 +1,29 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { Alarm, CursorAt, ErrorMessage, KeyboardLocked, StatusStateModel } from '../../state/status';
-import { ClearCellValue, ScreenStateModel, UpdateCellValue } from '../../state/screen';
-import { LifecycleComponent, OnChange, debounce } from 'ellib';
-
+import { AfterViewInit } from '@angular/core';
 import { AID } from '../../services/types';
 import { AIDLookup } from '../../services/constants';
-import { LU3270Service } from '../../services/lu3270';
-import { LayoutStateModel } from '../../state/layout';
-import { PrefsStateModel } from '../../state/prefs';
-import { Store } from '@ngxs/store';
+import { Alarm } from '../../state/status';
+import { ChangeDetectionStrategy } from '@angular/core';
+import { ClearCellValue } from '../../state/screen';
+import { Component } from '@angular/core';
 import { config } from '../../config';
+import { CursorAt } from '../../state/status';
+import { debounce } from 'ellib';
+import { ElementRef } from '@angular/core';
+import { ErrorMessage } from '../../state/status';
+import { EventEmitter } from '@angular/core';
+import { HostListener } from '@angular/core';
+import { Input } from '@angular/core';
+import { KeyboardLocked } from '../../state/status';
+import { LayoutStateModel } from '../../state/layout';
+import { LifecycleComponent } from 'ellib';
+import { LU3270Service } from '../../services/lu3270';
+import { OnChange } from 'ellib';
+import { Output } from '@angular/core';
+import { PrefsStateModel } from '../../state/prefs';
+import { ScreenStateModel } from '../../state/screen';
+import { StatusStateModel } from '../../state/status';
+import { Store } from '@ngxs/store';
+import { UpdateCellValue } from '../../state/screen';
 
 /**
  * Screen component

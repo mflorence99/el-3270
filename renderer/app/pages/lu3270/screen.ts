@@ -5,9 +5,7 @@ import { Alarm } from '../../state/status';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { ClearCellValue } from '../../state/screen';
 import { Component } from '@angular/core';
-import { config } from '../../config';
 import { CursorAt } from '../../state/status';
-import { debounce } from 'ellib';
 import { ElementRef } from '@angular/core';
 import { ErrorMessage } from '../../state/status';
 import { EventEmitter } from '@angular/core';
@@ -24,6 +22,9 @@ import { ScreenStateModel } from '../../state/screen';
 import { StatusStateModel } from '../../state/status';
 import { Store } from '@ngxs/store';
 import { UpdateCellValue } from '../../state/screen';
+
+import { config } from '../../config';
+import { debounce } from 'ellib';
 
 /**
  * Screen component

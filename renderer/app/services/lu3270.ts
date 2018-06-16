@@ -1,18 +1,12 @@
-import { a2e } from 'ellib';
-import { addressFromBytes } from './utils';
-import { addressToBytes } from './utils';
 import { AID } from './types';
 import { AIDLookup } from './constants';
 import { Alarm } from '../state/status';
 import { Attributes } from './attributes';
-import { bytesFromDump } from './utils';
 import { Cell } from './cell';
 import { Command } from './types';
 import { CommandLookup } from './constants';
 import { Connected } from '../state/status';
 import { CursorAt } from '../state/status';
-import { dump } from 'ellib';
-import { e2a } from 'ellib';
 import { ElectronService } from 'ngx-electron';
 import { EraseUnprotected } from '../state/screen';
 import { EraseUnprotectedScreen } from '../state/screen';
@@ -35,11 +29,18 @@ import { SFID } from './types';
 import { SFIDLookup } from './constants';
 import { StatusStateModel } from '../state/status';
 import { Store } from '@ngxs/store';
-import { toHex } from 'ellib';
 import { UpdateCellAttributes } from '../state/screen';
 import { UpdateScreen } from '../state/screen';
 import { Waiting } from '../state/status';
 import { WCC } from './wcc';
+
+import { a2e } from 'ellib';
+import { addressFromBytes } from './utils';
+import { addressToBytes } from './utils';
+import { bytesFromDump } from './utils';
+import { dump } from 'ellib';
+import { e2a } from 'ellib';
+import { toHex } from 'ellib';
 
 /**
  * Encapsulates 3270 device handling

@@ -13,8 +13,9 @@ import { RootPageComponent } from './pages/root/page';
 import { RootPageModule } from './pages/root/module';
 import { RouterModule } from '@angular/router';
 import { Routes } from '@angular/router';
-import { states } from './state/app';
 import { StorageOption } from '@ngxs/storage-plugin';
+
+import { states } from './state/app';
 
 /**
  * el-3270 module definition

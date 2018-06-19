@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy } from '@angular/core';
 import { Component } from '@angular/core';
-import { config } from '../../config';
 import { DrawerPanelComponent } from 'ellib';
 import { FormBuilder } from '@angular/forms';
 import { FormGroup } from '@angular/forms';
@@ -10,7 +9,9 @@ import { OnChange } from 'ellib';
 import { PrefsStateModel } from '../../state/prefs';
 import { Validators } from '@angular/forms';
 
-/**
+import { config } from '../../config';
+
+/** 
  * Prefs component
  */
 

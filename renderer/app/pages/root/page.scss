@@ -9,14 +9,14 @@ lib-drawer-container {
   position: absolute;
   width: 100%;
 
-  --nav-height: 48px;
+  --toolbar-height: 48px;
 
   .content {
-    height: calc(100% - var(--nav-height));
+    height: calc(100% - var(--toolbar-height));
   }
 
   el3270-toolbar {
-    height: var(--nav-height);
+    height: var(--toolbar-height);
   }
 
   lib-drawer-panel {

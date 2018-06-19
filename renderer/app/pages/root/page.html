@@ -8,24 +8,24 @@
     (showKeyboard)="ctrl.showKeyboard($event)"
     [layout]="ctrl.layout$ | async"
     [prefs]="ctrl.prefs$ | async">
-  </el3270-toolbar>
+  </el3270-toolbar> 
 
   <lib-animated-router-outlet
-    class="content">
-  </lib-animated-router-outlet>
+    class="content">  
+  </lib-animated-router-outlet> 
 
   <lib-drawer-panel
     #prefsDrawer
-    position="right">
+    position="right"> 
 
     <el3270-prefs
       [prefs]="ctrl.prefs$ | async"
       #prefs>
-    </el3270-prefs>
+    </el3270-prefs>  
 
   </lib-drawer-panel>
 
-</lib-drawer-container>
+</lib-drawer-container> 
 
 <el3270-root-ctrl
   [prefsForm]="prefs.prefsForm.valueChanges | async"

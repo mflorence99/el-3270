@@ -1,4 +1,6 @@
 import { BarrelModule } from './barrel';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
 import { HelpPageComponent } from './pages/help/page';
 import { HelpPageModule } from './pages/help/module';
 import { LU3270PageComponent } from './pages/lu3270/page';
@@ -25,6 +27,8 @@ const COMPONENTS = [ ];
 
 const MODULES = [
   BarrelModule,
+  BrowserAnimationsModule,
+  BrowserModule,
   HelpPageModule,
   RootPageModule,
   LU3270PageModule

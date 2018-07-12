@@ -10,7 +10,8 @@ EL-3270 is an [IBM 3270](https://en.wikipedia.org/wiki/IBM_3270) terminal emulat
   * [The MVS 3.8j Tur(n)key 4- System](#the-mvs-38j-turnkey-4--system)
 - [References](#references)
 - [How to Run in Development Mode](#how-to-run-in-development-mode)
-- [How to Run in Production Mode](#how-to-run-in-production-mode)
+- [How to Run in Production Mode (Linux)](#how-to-run-in-production-mode-linux)
+- [How to Run in Production Mode (Windows and Mac)](#how-to-run-in-production-mode-windows-and-mac)
 - [UI Tour](#ui-tour)
   * [Initial Configuration](#initial-configuration)
   * [Sample Screen](#sample-screen)
@@ -92,7 +93,7 @@ Finally, in another session, start the Electron app itself.
 npm run test
 ```
 
-## How to Run in Production Mode
+## How to Run in Production Mode (Linux)
 
 > NOTE: this currently only works for Ubuntu / Debian.
 
@@ -112,6 +113,14 @@ Then package and install the app.
 npm run package
 npm run deb64
 npm run deb64-install
+```
+
+## How to Run in Production Mode (Windows and Mac)
+
+Although there are currently no installation files except for Linux, you can still start EL-3270 in production mode.
+
+```sh
+npm run live
 ```
 
 ## UI Tour

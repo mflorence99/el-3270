@@ -68,8 +68,8 @@
     "eslint": "5",
     "markdown-toc": "1",
     "rimraf": "2",
-    "ts-node": "6",
-    "tslint": "7",
+    "ts-node": "7",
+    "tslint": "5",
     "typescript": "~2.7"
   }
 }

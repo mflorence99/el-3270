@@ -45,7 +45,7 @@ export class KeyboardComponent extends LifecycleComponent {
 
   // bind OnChange handlers
 
-  @OnChange('layout') showKeyboard() {
+  @OnChange('layout') newState() {
     this.maxHeight = (this.layout && this.layout.showKeyboard)? '144px' : '0';
   }
 

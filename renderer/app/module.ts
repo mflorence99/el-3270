@@ -65,7 +65,7 @@ const SERVICES = [
       storage: StorageOption.LocalStorage
     }),
     NgxsReduxDevtoolsPluginModule.forRoot({disabled: !window['DEV_MODE']}),
-    RouterModule.forRoot(ROUTES)
+    RouterModule.forRoot(ROUTES, { enableTracing: false, useHash: true })
   ],
 
   providers: [

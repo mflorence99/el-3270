@@ -6,6 +6,7 @@ import { FormGroup } from '@angular/forms';
 import { Input } from '@angular/core';
 import { LifecycleComponent } from 'ellib';
 import { OnChange } from 'ellib';
+import { PrefsFormGroup } from './ctrl';
 import { PrefsStateModel } from '../../state/prefs';
 import { Validators } from '@angular/forms';
 
@@ -34,14 +35,16 @@ export class PrefsComponent extends LifecycleComponent {
     super();
     // create prefs form controls
     this.prefsForm = this.formBuilder.group({
-      host: ['', Validators.required],
-      port: ['', [
-        Validators.required,
-        Validators.min(config.portMin),
-        Validators.max(config.portMax)]
-      ],
-      model: ['', Validators.required],
-      color: ['', Validators.required]
+      prefs: this.formBuilder.group({
+        host: ['', Validators.required],
+        port: ['', [
+          Validators.required,
+          Validators.min(config.portMin),
+          Validators.max(config.portMax)]
+        ],
+        model: ['', Validators.required],
+        color: ['', Validators.required]
+      } as PrefsFormGroup)
     });
   }
 
@@ -54,7 +57,7 @@ export class PrefsComponent extends LifecycleComponent {
 
   @OnChange('prefs') newState() {
     if (this.prefs)
-      this.prefsForm.patchValue(this.prefs, { emitEvent: false });
+      this.prefsForm.patchValue({ prefs: this.prefs });
   }
 
 }

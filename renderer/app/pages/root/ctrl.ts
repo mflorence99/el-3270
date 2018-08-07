@@ -25,6 +25,19 @@ import { nextTick } from 'ellib';
 import { take } from 'rxjs/operators';
 
 /**
+ * Model forms
+ */
+
+export type PrefsFormGroup = {
+  [P in keyof PrefsStateModel]: any;
+};
+
+export interface PrefsForm {
+  prefs: PrefsStateModel;
+  submitted: boolean;
+}
+
+/**
  * Root controller
  */
 
@@ -37,7 +50,7 @@ import { take } from 'rxjs/operators';
 
 export class RootCtrlComponent extends LifecycleComponent {
 
-  @Input() prefsForm = { } as PrefsStateModel;
+  @Input() prefsForm = { } as PrefsForm;
 
   @Select(LayoutState) layout$: Observable<LayoutStateModel>;
   @Select(PrefsState) prefs$: Observable<PrefsStateModel>;
@@ -93,7 +106,7 @@ export class RootCtrlComponent extends LifecycleComponent {
       // at worst, running in NgZone should work -- but otherwise a DOM
       // event is necessary to force change detection
       nextTick(() => {
-        this.store.dispatch(new UpdatePrefs(this.prefsForm));
+        this.store.dispatch(new UpdatePrefs(this.prefsForm.prefs));
       });
     }
   }

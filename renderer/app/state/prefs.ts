@@ -16,7 +16,6 @@ export interface PrefsStateModel {
   numCols: number;
   numRows: number;
   color: string;
-  submitted?: boolean;
 }
 
 @State<PrefsStateModel>({

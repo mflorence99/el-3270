@@ -69,7 +69,7 @@ Finally, these two documents are great introductions, but you can't count on the
 First, unless you have access to a host that supports 3270 connections, you should run TK4. All the screenshots here are taken using TK4. On my development system:
 
 ```sh
-cd /mvs38
+cd ~/mvs38
 ./mvs
 ```
 

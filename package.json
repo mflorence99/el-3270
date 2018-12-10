@@ -37,10 +37,10 @@
     "@fortawesome/free-brands-svg-icons": "5",
     "@fortawesome/free-regular-svg-icons": "5",
     "@fortawesome/free-solid-svg-icons": "5",
-    "@ngxs/devtools-plugin": "3.2.0",
-    "@ngxs/logger-plugin": "3.2.0",
-    "@ngxs/storage-plugin": "3.2.0",
-    "@ngxs/store": "3.2.0",
+    "@ngxs/devtools-plugin": "3",
+    "@ngxs/logger-plugin": "3",
+    "@ngxs/storage-plugin": "3",
+    "@ngxs/store": "3",
     "core-js": "2",
     "electron-capture": "1",
     "ellib": "latest",
@@ -71,6 +71,6 @@
     "rimraf": "2",
     "ts-node": "7",
     "tslint": "5",
-    "typescript": "3"
+    "typescript": "3.1.1"
   }
 }

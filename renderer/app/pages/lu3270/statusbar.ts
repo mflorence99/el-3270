@@ -28,7 +28,7 @@ export class StatusbarComponent extends LifecycleComponent {
   @Input() screen = { } as ScreenStateModel;
   @Input() status = { } as StatusStateModel;
 
-  @ViewChild('ding') ding;
+  @ViewChild('ding', { static: true }) ding;
 
   /** ctor */
   constructor(private element: ElementRef,

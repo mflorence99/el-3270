@@ -22,8 +22,11 @@ app.on('ready', () => {
     height: 600,
     resizable: true,
     webPreferences: {
+      nodeIntegration: true,
       // NOTE: we remove /dist in dev mode
-      preload: (isDev? __dirname.substring(0, __dirname.length - 5) :  __dirname) + '/node_modules/electron-capture/src/preload.js'
+      preload: (isDev ? __dirname.substring(0, __dirname.length - 5) : __dirname) + '/node_modules/electron-capture/src/preload.js',
+      scrollBounce: true,
+      webSecurity: !isDev
     }
   });
   if (isDev) {

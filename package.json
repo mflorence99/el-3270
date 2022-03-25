@@ -60,7 +60,7 @@
     "@types/node": "12",
     "codelyzer": "5",
     "devtron": "1",
-    "electron": "5",
+    "electron": "13",
     "electron-devtools-installer": "2",
     "electron-installer-debian": "2",
     "electron-packager": "14",
